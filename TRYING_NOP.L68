@@ -1,0 +1,240 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/18/16 3:41:38 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8      
+00001000                             9  START:                  ; first instruction of program
+00001000                            10   
+00001000                            11  
+00001000  343C 4E75                 12      MOVE.W  #$4E75, D2          * hardcodiing nop
+00001004                            13  
+00001004  B4BC 00004E71             14      CMP.L       #$4E71, D2      * has to be NOP
+0000100A                            15      
+0000100A  6700 000C                 16      BEQ         NOP_OPCODE
+0000100E                            17      
+0000100E  B4BC 00004E75             18      CMP.L       #$4E75, D2      * has to be RTS
+00001014                            19      
+00001014  6700 0012                 20      BEQ         RTS_OPCODE
+00001018                            21       
+00001018                            22  
+00001018                            23  NOP_OPCODE
+00001018  43F9 00001114             24      LEA         NOP_MESSAGE, A1     * print out message for 'NOP'
+0000101E                            25      
+0000101E  103C 000E                 26      MOVE.B      #14, D0
+00001022                            27      
+00001022  4E4F                      28      TRAP #15
+00001024                            29      
+00001024  6000 01BE                 30      BRA DONE
+00001028                            31  RTS_OPCODE 
+00001028  43F9 00001123             32      LEA         RTS_MESSAGE, A1     * print out message for 'RTS'
+0000102E                            33      
+0000102E  103C 000E                 34      MOVE.B      #14, D0
+00001032                            35      
+00001032  4E4F                      36      TRAP #15
+00001034                            37      
+00001034  6000 01AE                 38      BRA DONE
+00001038                            39      
+00001038                            40  JSR_OPCODE 
+00001038  43F9 0000111F             41      LEA         JSR_MESSAGE, A1     * print out message for 'JSR'
+0000103E                            42      
+0000103E  103C 000E                 43      MOVE.B      #14, D0
+00001042                            44      
+00001042  4E4F                      45      TRAP #15
+00001044                            46      
+00001044  6000 019E                 47      BRA DONE
+00001048                            48      
+00001048                            49  MOVEM_OPCODE 
+00001048  43F9 00001118             50      LEA         MOVEM_MESSAGE, A1     * print out message for 'MOVEM'
+0000104E                            51      
+0000104E  103C 000E                 52      MOVE.B      #14, D0
+00001052                            53      
+00001052  4E4F                      54      TRAP #15
+00001054                            55      
+00001054  4280                      56      CLR.L       D0
+00001056                            57  
+00001056  4281                      58      CLR.L       D1
+00001058                            59                 
+Line 60 ERROR: Undefined symbol
+00001058  303C BB8E                 60      MOVE.W      #example, D0
+0000105C                            61               
+0000105C  123C 0006                 62      MOVE.B      #6, D1
+00001060                            63                 
+00001060  E368                      64      LSL.W       D1, D0  *shift left 6 
+00001062                            65                 
+00001062  123C 000F                 66      MOVE.B      #15, D1
+00001066                            67                 
+00001066  E268                      68      LSR.W       D1, D0  *shift right 15, only size is left
+00001068                            69                 
+00001068  B07C 0000                 70      CMP.W       #0, D0
+0000106C                            71                 
+0000106C  43F9 000011BA             72      LEA         SIZE_W_PRINT, A1 
+00001072                            73      
+00001072  B07C 0001                 74      CMP.W       #1, D0
+00001076                            75                 
+00001076  43F9 000011C0             76      LEA         SIZE_L_PRINT, A1 
+0000107C                            77  
+0000107C  103C 000E                 78      MOVE.B      #14, D0
+00001080                            79      
+00001080  4E4F                      80      TRAP #15
+00001082                            81  
+00001082  6000 0160                 82      BRA DONE
+00001086                            83     
+00001086                            84  CLR_OPCODE 
+00001086  43F9 00001127             85      LEA         CLR_MESSAGE, A1     * print out message for 'CLR'
+0000108C                            86      
+0000108C  103C 000E                 87      MOVE.B      #14, D0
+00001090                            88      
+00001090  4E4F                      89      TRAP #15
+00001092                            90      
+00001092  6000 0150                 91      BRA DONE
+00001096                            92      
+00001096                            93   INCLUDE 'MESSAGE_Data.X68'
+00001096                            94  
+00001096  =0000000D                 95  CR  EQU $0D
+00001096  =0000000A                 96  LF  EQU $0A 
+00001096                            97  
+00001096= 57 65 6C 63 6F 6D ...     98  WELCOME_MESSAGE DC.B 'Welcome to our Team wild pokemon disassembly!!', CR, LF, 0
+000010C7= 45 6E 74 65 72 20 ...     99  STARTING        DC.B 'Enter the starting location: ', 0
+000010E5= 45 6E 74 65 72 20 ...    100  ENDING          DC.B 'Enter the ending locaiton: ', 0
+00001101                           101      
+00001101= 41 44 44 49 2E 00        102  ADDI_MESSAGE    DC.B 'ADDI.',0
+00001107= 4D 4F 56 45 41 2E 00     103  MOVEA_MESSAGE   DC.B 'MOVEA.',0
+0000110E= 4D 4F 56 45 2E 00        104  MOVE_MESSAGE    DC.B 'MOVE.',0
+00001114= 4E 4F 50 00              105  NOP_MESSAGE     DC.B 'NOP',0
+00001118= 4D 4F 56 45 4D 2E 00     106  MOVEM_MESSAGE   DC.B 'MOVEM.',0
+0000111F= 4A 53 52 00              107  JSR_MESSAGE     DC.B 'JSR',0
+00001123= 52 54 53 00              108  RTS_MESSAGE     DC.B 'RTS',0
+00001127= 43 4C 52 00              109  CLR_MESSAGE     DC.B 'CLR',0
+0000112B= 41 44 44 51 2E 00        110  ADDQ_MESSAGE    DC.B 'ADDQ.',0
+00001131= 42 45 51 00              111  BEQ_MESSAGE     DC.B 'BEQ',0   *//
+00001135= 42 4E 45 00              112  BNE_MESSAGE     DC.B 'BNE',0   *//
+00001139= 42 43 53 00              113  BCS_MESSAGE     DC.B 'BCS',0   *//
+0000113D= 42 47 45 00              114  BGE_MESSAGE     DC.B 'BGE',0   *//
+00001141= 42 47 54 00              115  BGT_MESSAGE     DC.B 'BGT',0   *//
+00001145= 42 48 49 00              116  BHI_MESSAGE     DC.B 'BHI',0   *//
+00001149= 42 4C 45 00              117  BLE_MESSAGE     DC.B 'BLE',0   *//
+0000114D= 42 4C 53 00              118  BLS_MESSAGE     DC.B 'BLS',0   *//
+00001151= 42 4C 54 00              119  BLT_MESSAGE     DC.B 'BLT',0   *//
+00001155= 42 4D 49 00              120  BMI_MESSAGE     DC.B 'BMI',0   *//
+00001159= 42 50 4C 00              121  BPL_MESSAGE     DC.B 'BPL',0   *//
+0000115D= 42 56 43 00              122  BVC_MESSAGE     DC.B 'BVC',0   *//
+00001161= 42 56 53 00              123  BVS_MESSAGE     DC.B 'BVS',0   *//
+00001165                           124  
+00001165= 4D 4F 56 45 51 2E 00     125  MOVEQ_MESSAGE   DC.B 'MOVEQ.',0
+0000116C= 44 49 56 55 2E 00        126  DIVU_MESSAGE    DC.B 'DIVU.',0
+00001172= 4F 52 2E 00              127  OR_MESSAGE      DC.B 'OR.',0
+00001176= 53 55 42 2E 00           128  SUB_MESSAGE     DC.B 'SUB.',0
+0000117B= 43 4D 50 2E 00           129  CMP_MESSAGE     DC.B 'CMP.',0
+00001180= 4D 55 4C 53 2E 00        130  MULS_MESSAGE    DC.B 'MULS.',0
+00001186= 41 4E 44 2E 00           131  AND_MESSAGE     DC.B 'AND.',0
+0000118B= 41 44 44 2E 00           132  ADD_MESSAGE     DC.B 'ADD.',0
+00001190= 41 44 44 41 2E 00        133  ADDA_MESSAGE    DC.B 'ADDA.',0
+00001196= 4C 53 4C 2E 00           134  LSL_MESSAGE     DC.B 'LSL.',0 *//
+0000119B= 41 53 4C 2E 00           135  ASL_MESSAGE     DC.B 'ASL.',0
+000011A0= 52 4F 4C 2E 00           136  ROL_MESSAGE     DC.B 'ROL.',0
+000011A5= 4C 53 52 2E 00           137  LSR_MESSAGE     DC.B 'LSR.',0 *//
+000011AA= 41 53 52 2E 00           138  ASR_MESSAGE     DC.B 'ASR.',0
+000011AF= 52 4F 52 2E 00           139  ROR_MESSAGE     DC.B 'ROR.',0
+000011B4= 42 20 20 20 20 00        140  SIZE_B_PRINT    DC.B 'B    ',0
+000011BA= 57 20 20 20 20 00        141  SIZE_W_PRINT    DC.B 'W    ',0
+000011C0= 4C 20 20 20 20 00        142  SIZE_L_PRINT    DC.B 'L    ',0
+000011C6= 23 00                    143  POUND_SIGN      DC.B '#',0
+000011C8= 24 00                    144  HEX_SIGN        DC.B '$',0
+000011CA                           145  
+000011CA= 44 00                    146  D_REGISTER      DC.B 'D',0
+000011CC= 41 00                    147  A_REGISTER      DC.B 'A',0
+000011CE= 28 41 00                 148  IA_START        DC.B '(A',0
+000011D1= 29 00                    149  IA_END          DC.B ')',0
+000011D3= 28 41 00                 150  A_PI_START      DC.B '(A',0
+000011D6= 29 2B 00                 151  A_PI_END        DC.B ')+',0
+000011D9= 2D 28 41 00              152  A_PD_START      DC.B '-(A',0
+000011DD= 29 00                    153  A_PD_END        DC.B ')',0
+000011DF                           154  
+000011DF                           155  
+000011DF                           156  
+000011DF                           157  
+000011DF                           158  
+000011DF                           159  
+000011DF                           160  -------------------- end include --------------------
+000011E0  FFFF FFFF                161      SIMHALT             ; halt simulator
+000011E4                           162  DONE
+000011E4                           163  * Put variables and constants here
+000011E4                           164  
+000011E4                           165      END    START        ; last line of source
+
+1 error detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDA_MESSAGE        1190
+ADDI_MESSAGE        1101
+ADDQ_MESSAGE        112B
+ADD_MESSAGE         118B
+AND_MESSAGE         1186
+ASL_MESSAGE         119B
+ASR_MESSAGE         11AA
+A_PD_END            11DD
+A_PD_START          11D9
+A_PI_END            11D6
+A_PI_START          11D3
+A_REGISTER          11CC
+BCS_MESSAGE         1139
+BEQ_MESSAGE         1131
+BGE_MESSAGE         113D
+BGT_MESSAGE         1141
+BHI_MESSAGE         1145
+BLE_MESSAGE         1149
+BLS_MESSAGE         114D
+BLT_MESSAGE         1151
+BMI_MESSAGE         1155
+BNE_MESSAGE         1135
+BPL_MESSAGE         1159
+BVC_MESSAGE         115D
+BVS_MESSAGE         1161
+CLR_MESSAGE         1127
+CLR_OPCODE          1086
+CMP_MESSAGE         117B
+CR                  D
+DIVU_MESSAGE        116C
+DONE                11E4
+D_REGISTER          11CA
+ENDING              10E5
+HEX_SIGN            11C8
+IA_END              11D1
+IA_START            11CE
+JSR_MESSAGE         111F
+JSR_OPCODE          1038
+LF                  A
+LSL_MESSAGE         1196
+LSR_MESSAGE         11A5
+MOVEA_MESSAGE       1107
+MOVEM_MESSAGE       1118
+MOVEM_OPCODE        1048
+MOVEQ_MESSAGE       1165
+MOVE_MESSAGE        110E
+MULS_MESSAGE        1180
+NOP_MESSAGE         1114
+NOP_OPCODE          1018
+OR_MESSAGE          1172
+POUND_SIGN          11C6
+ROL_MESSAGE         11A0
+ROR_MESSAGE         11AF
+RTS_MESSAGE         1123
+RTS_OPCODE          1028
+SIZE_B_PRINT        11B4
+SIZE_L_PRINT        11C0
+SIZE_W_PRINT        11BA
+START               1000
+STARTING            10C7
+SUB_MESSAGE         1176
+WELCOME_MESSAGE     1096

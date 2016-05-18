@@ -92,7 +92,7 @@ ADDI_PRINTOUT  * for printing out the ADDI
                
                MOVE.W      #example, D1
         
-               LEA         SIZE_B_PRINT, A1
+               LEA         SIZE_B_PRINT, A1    * NOTE - how do you know this is of size B ????? 
                
                MOVE.B      #14, D0
                
@@ -103,6 +103,7 @@ ADDI_PRINTOUT  * for printing out the ADDI
                CMP.B       #8, D1
                
                * JSR         PRINTOUT_SIZE
+
 
 *~Font name~Courier New~
 *~Font size~10~
