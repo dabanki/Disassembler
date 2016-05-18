@@ -2,7 +2,7 @@
 * Title      : Disassembler
 * Written by : Ko Fukushima, Daminan Banki, , Samuel Williams
 * Date       : 5/12/2016
-* Description: 
+* Description: It's not your fault
 *-----------------------------------------------------------
 
         ORG    $1000
@@ -26,6 +26,7 @@ START:      	* ORG and END address
 * Put variables and constants here
 
         END    START        ; last line of source
+
 
 
 
