@@ -11,14 +11,14 @@ START:                  ; first instruction of program
 
     MOVE.W  #$4E75, D2          * hardcodiing nop
 
-    CMP.L       #$4E71, D2      * has to be NOP
+   * CMP.L       #$4E71, D2      * has to be NOP
+    *
+   * BEQ         NOP_OPCODE
     
-    BEQ         NOP_OPCODE
+   * CMP.L       #$4E75, D2      * has to be RTS
     
-    CMP.L       #$4E75, D2      * has to be RTS
-    
-    BEQ         RTS_OPCODE
-     
+  *  BEQ         RTS_OPCODE
+   BRA CLR_OPCODE  
 
 NOP_OPCODE
     LEA         NOP_MESSAGE, A1     * print out message for 'NOP'
@@ -57,7 +57,7 @@ MOVEM_OPCODE
 
     CLR.L       D1
                
-    MOVE.W      #example, D0
+    MOVE.W      D2, D0
              
     MOVE.B      #6, D1
                
@@ -92,7 +92,7 @@ CLR_OPCODE
     
     TRAP #15
     
-    MOVE.W      #example, D0
+    MOVE.W      D2, D0
              
     MOVE.B      #6, D1
                
@@ -130,6 +130,7 @@ DONE
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
