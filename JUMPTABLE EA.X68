@@ -1,5 +1,8 @@
  ORG     $400
 
+* D6 is mode, D7 is register 
+* Dn, An, (An), (An)+, -(An)
+* Jumps based on mode
 
 * Consider the next instruction. Why do we have to multiply the index 
 
@@ -9,9 +12,9 @@ example          EQU     %0000011000000110
                  MOVE.L    #$10342035, (A5)
 
 start 
-               MOVE.B      #%111,D6         *MODE
+               MOVE.B      #%010,D6         *MODE
                
-               MOVE.B      #%001,D7         *REGISTER
+               MOVE.B      #%111,D7         *REGISTER
                
                LEA     jmp_table_ea,A0      *Index into the table
 
@@ -241,6 +244,8 @@ ABSOLUTE_SHORT
             
             TRAP #15
             
+            BRA DONE  
+
 
 ABSOLUTE_LONG
             LEA         HEX_SIGN, A1
@@ -258,11 +263,17 @@ ABSOLUTE_LONG
             MOVE.B      #16, D2
             
             TRAP #15
+                        
+            BRA DONE  
 
 
 IMMEDIATE
 
+            BRA DONE  
+
 DONE
+    RTS
+    
   INCLUDE 'MESSAGE_Data.X68'
      
         
@@ -270,6 +281,7 @@ DONE
                END   $400 
 
  
+
 
 
 *~Font name~Courier New~
