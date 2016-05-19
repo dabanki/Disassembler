@@ -1,4 +1,4 @@
- ORG     $400
+* ORG     $400
 
 * D6 is mode, D7 is register 
 * Dn, An, (An), (An)+, -(An)
@@ -7,14 +7,12 @@
 * Consider the next instruction. Why do we have to multiply the index 
 
 * by 6? How many bytes does a single jump table entry require? 
-example          EQU     %0000011000000110
-                 MOVEA.W    #$7000, A5
-                 MOVE.L    #$10342035, (A5)
 
-start 
-               MOVE.B      #%010,D6         *MODE
-               
-               MOVE.B      #%111,D7         *REGISTER
+
+*start 
+*               MOVE.B      #%010,D6         *MODE
+*               
+*               MOVE.B      #%111,D7         *REGISTER
                
                LEA     jmp_table_ea,A0      *Index into the table
 
@@ -281,6 +279,9 @@ DONE
                END   $400 
 
  
+
+
+
 
 
 

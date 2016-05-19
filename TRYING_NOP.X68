@@ -8,7 +8,6 @@
     
 START:                  ; first instruction of program
  
-
     MOVE.W  #$4E75, D2          * hardcodiing nop
 
     CMP.L       #$4E71, D2      * has to be NOP
@@ -57,7 +56,7 @@ MOVEM_OPCODE
 
     CLR.L       D1
                
-    MOVE.W      #example, D0
+    MOVE.W      #example, D0  * the 16 bits in memory 
              
     MOVE.B      #6, D1
                
