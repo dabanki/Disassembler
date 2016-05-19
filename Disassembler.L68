@@ -1,0 +1,780 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/18/2016 3:08:21 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : Disassembler
+00000000                             3  * Written by : Ko Fukushima, Daminan Banki, , Samuel Williams
+00000000                             4  * Date       : 5/12/2016
+00000000                             5  * Description: It's not your fault
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00001000                             8          ORG    $1000
+00001000                             9  START:          * ORG and END address
+00001000                            10  
+00001000                            11  * ORG the program so that it straddles the address boundary $00007FFF to $00008000
+00001000                            12  
+00001000                            13          INCLUDE 'test.X68'
+00001000                            14  
+00001000                            15  
+00001000  4E71                      16          NOP         *Required
+00001002  6000 0058                 17          BRA     NEXT_STEP
+00001006  4E75                      18          RTS         *Required
+00001008  4E72 2000                 19          STOP    #$2000      * Not required instruction
+0000100C                            20  
+0000100C                            21  
+0000100C  0640 4000                 22  add_start   ADDI.W  #$4000,D0   
+00001010                            23          
+00001010  9CD4                      24  subtracts   SUBA.W  (A4),A6
+00001012                            25  
+00001012                            26  
+00001012= FF AA 45 0A               27  data1       DC.B        $FF,$AA,$45,$0A
+00001016                            28  
+00001016                            29  
+00001016  1200                      30  moves       MOVE.B  D0,D1
+00001018                            31  
+00001018= 48 65 72 65 20 69 ...     32  data5       DC.B    'Here is some interspersed data'
+00001036                            33          
+00001036                            34      
+00001036  0238 0001 4568            35  ands        AND.B   #$01,$4568
+0000103C                            36  
+0000103C  E120                      37  shifts      ASL.B   D0,D0
+0000103E                            38  
+0000103E  E5BB                      39  rolls       ROL.L   D2,D3
+00001040                            40  
+00001040  4244                      41  clear       CLR D4
+00001042                            42  
+00001042  45F9 DC00FF00             43  load_addr   LEA $DC00FF00,A2
+00001048                            44  
+00001048= 0B85 019B 0B20 1EBD       45          DC.W    2949,0411,2848,7869
+00001050                            46  
+00001050  BA13                      47  compares    CMP.B   (A3),D5
+00001052                            48  
+00001052                            49          
+00001052                            50  
+00001052                            51  
+00001052  64FC                      52  jmplabel    BCC compares        
+00001054  6EFA                      53          BGT compares        
+00001056  6FF8                      54          BLE compares    
+00001058                            55          
+00001058  C7C0                      56  multiply    MULS    D0,D3
+0000105A  8AD3                      57          DIVU    (A3),D5 *Optional instruction
+0000105C                            58          
+0000105C                            59  NEXT_STEP
+0000105C                            60  
+0000105C                            61  
+0000105C                            62  
+0000105C                            63  
+0000105C                            64  
+0000105C                            65  -------------------- end include --------------------
+0000105C                            66          INCLUDE 'INPUT.X68'
+0000105C                            67      * I/O 
+0000105C                            68      
+0000105C                            69      * Welcome message
+0000105C  43F9 00001306             70          LEA WELCOME_MESSAGE, A1
+00001062  103C 000E                 71          MOVE.B #14, D0
+00001066  4E4F                      72          TRAP #15
+00001068                            73          
+00001068                            74  STARTING_MESSAGE    
+00001068                            75      * Printing out the Starting address message
+00001068  43F9 00001337             76          LEA STARTING, A1
+0000106E  103C 000E                 77          MOVE.B #14, D0
+00001072  4E4F                      78          TRAP #15
+00001074                            79      
+00001074                            80      * Code for input
+00001074  227C 00002000             81          MOVEA.L #$2000, A1 *we have to change this addr later
+0000107A  103C 0002                 82          MOVE.B #2, D0
+0000107E  4E4F                      83          TRAP #15
+00001080  143C 0008                 84          MOVE.B #MAX_USER_INPUT, D2
+00001084                            85      
+00001084                            86      * JSR to convert string function
+00001084  4EB9 000010DE             87          JSR CONVERT_STRING   
+0000108A                            88      * check if the address is even number
+0000108A  E25C                      89          ROR #1, D4   * C now holds 0 (if even) or 1 (if odd)
+0000108C  65DA                      90          BCS STARTING_MESSAGE   *if carry is set then the user typed in an odd address
+0000108E  E35C                      91          ROL #1, D4     *PUT D4 BACK
+00001090                            92         
+00001090                            93      * store hex value of inputted string 
+00001090  23C4 00001454             94          MOVE.L D4, STARTING_ADDR 
+00001096                            95      * reset the D4
+00001096  4284                      96          CLR.L  D4
+00001098                            97          
+00001098                            98  ENDING_MESSAGE
+00001098                            99      * message user to input
+00001098  43F9 00001355            100          LEA ENDING, A1   
+0000109E  103C 000E                101          MOVE.B #14, D0
+000010A2  4E4F                     102          TRAP #15
+000010A4                           103      * read user input
+000010A4  227C 00002000            104          MOVEA.L #$2000, A1 *we have to change this addr later
+000010AA  103C 0002                105          MOVE.B #2, D0   
+000010AE  4E4F                     106          TRAP #15
+000010B0                           107      * counter for loop
+000010B0  143C 0008                108          MOVE.B #MAX_USER_INPUT, D2   
+000010B4                           109      * JSR to convert string function
+000010B4  4EB9 000010DE            110          JSR CONVERT_STRING 
+000010BA                           111          
+000010BA                           112      * check if the address is even number
+000010BA  E25C                     113          ROR #1, D4   * C now holds 0 (if even) or 1 (if odd)
+000010BC  65DA                     114          BCS ENDING_MESSAGE   *if carry is set then the user typed in an odd address
+000010BE  E35C                     115          ROL #1, D4     *PUT D4 BACK        
+000010C0                           116          
+000010C0                           117      * Check if the starting and ending address is the same
+000010C0                           118         ; CMP.L #STARTING_ADDR, D4
+000010C0  2A3C 00001454            119          MOVE.L #STARTING_ADDR, D5
+000010C6  2C39 00001454            120          MOVE.L STARTING_ADDR, D6
+000010CC  6ECA                     121          BGT   ENDING_MESSAGE
+000010CE                           122      * store hex value of inputted string   
+000010CE  23C4 00001458            123          MOVE.L D4, ENDING_ADDR   
+000010D4                           124          
+000010D4                           125      * clear the unused data in the data and address regisgter
+000010D4  4280                     126          CLR.L D0
+000010D6  4284                     127          CLR.L D4
+000010D8                           128          
+000010D8                           129          * Do error handling here Sam
+000010D8                           130          
+000010D8  4EF9 00001124            131          JMP GO_THROUGH_MEMORY
+000010DE                           132      
+000010DE                           133      * Get each char
+000010DE                           134  CONVERT_STRING 
+000010DE  1219                     135          MOVE.B (A1)+, D1
+000010E0                           136      
+000010E0                           137      * Go to next instruction for converting
+000010E0  B23C 0039                138          CMP.B #$39, D1
+000010E4  6F00 000A                139          BLE NUMBER
+000010E8                           140          
+000010E8  B23C 0041                141          CMP.B #$41, D1
+000010EC  6C00 0012                142          BGE CHAR   
+000010F0                           143      
+000010F0                           144      * Convert Ascii numbers to hex
+000010F0  B23C 002F                145  NUMBER  CMP.B #$2F, D1
+000010F4                           146      * Number is out of range
+000010F4  6F00 002C                147          BLE ERROR       
+000010F8  0401 0030                148          SUB.B #48, D1
+000010FC                           149          
+000010FC                           150      * Need to be changed the name of label
+000010FC  6000 0012                151          BRA STORE_ADDR    
+00001100                           152      
+00001100                           153      * Convert Ascii charaters to hex
+00001100  B27C 005B                154  CHAR    CMP #$5B, D1
+00001104                           155      * Number is out of range
+00001104  6C00 001C                156          BGE ERROR
+00001108                           157          
+00001108  0401 0037                158          SUB.B #55, D1
+0000110C  6000 0002                159          BRA STORE_ADDR
+00001110                           160          
+00001110                           161  STORE_ADDR
+00001110                           162      * Add converted nibble to overall number
+00001110  D801                     163          ADD.B D1, D4
+00001112                           164      * Clear D1 for reuse 
+00001112  4201                     165          CLR.B D1
+00001114                           166      * Subtract from counter
+00001114  5342                     167          SUB #1, D2
+00001116                           168      * If counter is 0, we compared all 8 hex numbers
+00001116  B43C 0000                169          CMP.B #0, D2
+0000111A  6700 0006                170          BEQ ENDCONV
+0000111E                           171      * Shift the overall number to the left by 1 nibble, so it will fit next hex number
+0000111E  E98C                     172          LSL.L #4, D4
+00001120  60BC                     173          BRA CONVERT_STRING
+00001122                           174          
+00001122                           175      * Error handling
+00001122                           176  ERROR 
+00001122                           177      
+00001122                           178  ENDCONV * Next instruction starts 
+00001122  4E75                     179          RTS
+00001124                           180         * MOVE.L D4, STARTING_ADDR 
+00001124                           181          
+00001124                           182  GO_THROUGH_MEMORY
+00001124                           183  
+00001124                           184  
+00001124                           185  
+00001124                           186  
+00001124                           187  
+00001124                           188  
+00001124                           189  
+00001124                           190  
+00001124                           191  
+00001124                           192  
+00001124                           193  
+00001124                           194  
+00001124                           195  
+00001124                           196  
+00001124                           197  
+00001124                           198  
+00001124                           199  
+00001124                           200  
+00001124                           201  
+00001124                           202  -------------------- end include --------------------
+00001124                           203          INCLUDE 'GROUP_OP_CODE.X68'
+00001124                           204      
+00001124  41F9 00001136            205                 LEA     jmp_table,A0            *Index into the table
+0000112A                           206  
+0000112A  4280                     207                 CLR.L   D0              *Zero it
+0000112C                           208  
+0000112C  303C 0606                209                 MOVE.W  #example,D0     *We'll play with it here
+00001130                           210  
+00001130  123C 000C                211                 MOVE.B  #shift,D1       *Shift 12 bits to the right  
+00001134                           212  
+00001134  E268                     213                 LSR.W   D1,D0           *Move the bits
+00001136                           214  
+00001136  4EF9 00001196            215  jmp_table      JMP         code0000
+0000113C                           216  
+0000113C  4EF9 0000119A            217                 JMP         code0001
+00001142                           218  
+00001142  4EF9 0000119E            219                 JMP         code0010
+00001148                           220  
+00001148  4EF9 000011A2            221                 JMP         code0011
+0000114E                           222  
+0000114E  4EF9 000011A6            223                 JMP         code0100
+00001154                           224  
+00001154  4EF9 000011AA            225                 JMP         code0101
+0000115A                           226  
+0000115A  4EF9 000011AE            227                 JMP         code0110
+00001160                           228  
+00001160  4EF9 000011B2            229                 JMP         code0111
+00001166                           230  
+00001166  4EF9 000011B6            231                 JMP         code1000
+0000116C                           232  
+0000116C  4EF9 000011BA            233                 JMP         code1001
+00001172                           234  
+00001172  4EF9 000011BE            235                 JMP         code1010
+00001178                           236  
+00001178  4EF9 000011C2            237                 JMP         code1011
+0000117E                           238  
+0000117E  4EF9 000011C6            239                 JMP         code1100
+00001184                           240  
+00001184  4EF9 000011CA            241                 JMP         code1101
+0000118A                           242  
+0000118A  4EF9 000011CE            243                 JMP         code1110
+00001190                           244  
+00001190  4EF9 000011D2            245                 JMP         code1111
+00001196                           246  
+00001196                           247  
+00001196  6000 003E                248  code0000       BRA         ADDI * we don't have it now
+0000119A                           249  
+0000119A  4E72 2700                250  code0001       STOP        #$2700 * BRA         MOVEB
+0000119E                           251  
+0000119E  4E72 2700                252  code0010       STOP        #$2700 * BRA         MOVEW
+000011A2                           253  
+000011A2  4E72 2700                254  code0011       STOP        #$2700 * BRA         MOVEL
+000011A6                           255  
+000011A6  4E72 2700                256  code0100       STOP        #$2700 * BRA         GROUP_0100_CODE
+000011AA                           257  
+000011AA  4E72 2700                258  code0101       STOP        #$2700 * BRA         ADDQ * we don't have it now
+000011AE                           259  
+000011AE  4E72 2700                260  code0110       STOP        #$2700 * BRA         BCC * we don't have it now
+000011B2                           261  
+000011B2  4E72 2700                262  code0111       STOP        #$2700 * BRA         MOVEQ
+000011B6                           263  
+000011B6  4E72 2700                264  code1000       STOP        #$2700 * BRA         DIVU_OR
+000011BA                           265  
+000011BA  4E72 2700                266  code1001       STOP        #$2700 * BRA         SUB * we don't have it now
+000011BE                           267  
+000011BE  4E72 2700                268  code1010       STOP        #$2700 * It's gonna be error
+000011C2                           269  
+000011C2  4E72 2700                270  code1011       STOP        #$2700 * BRA         CMP
+000011C6                           271  
+000011C6  4E72 2700                272  code1100       STOP        #$2700 * BRA         MULS_AND
+000011CA                           273  
+000011CA  4E72 2700                274  code1101       STOP        #$2700 * BRA         ADD_ADDA       
+000011CE                           275  
+000011CE  4E72 2700                276  code1110       STOP        #$2700 * BRA        SHIFTS
+000011D2                           277  
+000011D2  4E72 2700                278  code1111       STOP        #$2700 * It's gonna be error
+000011D6                           279  
+000011D6                           280  
+000011D6                           281  -------------------- end include --------------------
+000011D6                           282          INCLUDE 'ADDI.X68'
+000011D6                           283    
+000011D6                           284  ADDI           * first check the first 4 bits after the op-code
+000011D6  4280                     285                 CLR.L       D0
+000011D8                           286  
+000011D8  4281                     287                 CLR.L       D1
+000011DA                           288                 
+000011DA  303C 0606                289                 MOVE.W      #example, D0
+000011DE                           290                 
+000011DE  123C 0008                291                 MOVE.B      #8, D1 * for shifting to the right by 8 bits
+000011E2                           292                 
+000011E2  E268                     293                 LSR.W       D1, D0
+000011E4                           294                 
+000011E4  B07C 0006                295                 CMP.W       #6, D0 * checking the first 4 bits 
+000011E8                           296                 
+000011E8  6600 FF38                297                 BNE         ERROR  * go to error 
+000011EC                           298                 
+000011EC                           299                 * second check the size
+000011EC  4280                     300                 CLR.L       D0
+000011EE                           301  
+000011EE  4281                     302                 CLR.L       D1
+000011F0                           303                 
+000011F0  303C 0606                304                 MOVE.W      #example, D0
+000011F4                           305                 
+000011F4  123C 0006                306                 MOVE.B      #6, D1 * for shifting to the right by 8 bits
+000011F8                           307                 
+000011F8  E268                     308                 LSR.W       D1, D0
+000011FA                           309                 
+000011FA  B07C 001B                310                 CMP.W       #27, D0 * checking the first 4 bits 
+000011FE                           311                 
+000011FE  6700 FF22                312                 BEQ         ERROR  * go to error 
+00001202                           313                 
+00001202                           314                 * third check the mode
+00001202  4280                     315                 CLR.L       D0
+00001204                           316  
+00001204  4281                     317                 CLR.L       D1
+00001206                           318                 
+00001206  303C 0606                319                 MOVE.W      #example, D0
+0000120A                           320                 
+0000120A  123C 000A                321                 MOVE.B      #10, D1
+0000120E                           322                 
+0000120E  E368                     323                 LSL.W       D1, D0
+00001210                           324                 
+00001210  123C 000D                325                 MOVE.B      #13, D1
+00001214                           326                 
+00001214  E268                     327                 LSR.W       D1, D0
+00001216                           328                 
+00001216  B07C 0001                329                 CMP.W       #mode_an, D0
+0000121A                           330                 
+0000121A  6700 FF06                331                 BEQ         ERROR 
+0000121E                           332                 
+0000121E  B03C 0007                333                 CMP.B       #mode_id, D0
+00001222                           334                 
+00001222  6700 0006                335                 BEQ         ADDI_CHECK_ID
+00001226                           336                 
+00001226  6000 002A                337                 BRA         ADDI_PRINTOUT
+0000122A                           338  ADDI_CHECK_ID               
+0000122A                           339                 * check to make sure that the register is not using immediate data
+0000122A  4280                     340                 CLR.L       D0
+0000122C                           341  
+0000122C  4281                     342                 CLR.L       D1
+0000122E                           343                 
+0000122E  303C 0606                344                 MOVE.W      #example, D0
+00001232                           345                 
+00001232  123C 000A                346                 MOVE.B      #10, D1
+00001236                           347                 
+00001236  E368                     348                 LSL.W       D1, D0
+00001238                           349                 
+00001238  123C 000A                350                 MOVE.B      #10, D1
+0000123C                           351                 
+0000123C  E268                     352                 LSR.W       D1, D0
+0000123E                           353                 
+0000123E  B07C 0038                354                 CMP.W       #%0000000000111000, D0
+00001242                           355                 
+00001242  6700 000E                356                 BEQ         ADDI_PRINTOUT
+00001246                           357                 
+00001246  B07C 0039                358                 CMP.W       #%0000000000111001, D0
+0000124A                           359                 
+0000124A  6700 0006                360                 BEQ         ADDI_PRINTOUT
+0000124E                           361                 
+0000124E  6000 FED2                362                 BRA         ERROR
+00001252                           363                 
+00001252                           364  ADDI_PRINTOUT  * for printing out the ADDI
+00001252  4280                     365                 CLR.L       D0
+00001254                           366  
+00001254  4281                     367                 CLR.L       D1
+00001256                           368                 
+00001256  323C 0606                369                 MOVE.W      #example, D1
+0000125A                           370          
+0000125A  43F9 00001424            371                 LEA         SIZE_B_PRINT, A1
+00001260                           372                 
+00001260  103C 000E                373                 MOVE.B      #14, D0
+00001264                           374                 
+00001264  4E4F                     375                 TRAP #15
+00001266                           376                 
+00001266  EC59                     377                 ROR.W       #6, D1
+00001268                           378  
+00001268  B23C 0008                379                 CMP.B       #8, D1
+0000126C                           380                 
+0000126C                           381                 * JSR         PRINTOUT_SIZE
+0000126C                           382  
+0000126C                           383  -------------------- end include --------------------
+0000126C                           384          INCLUDE 'DIVU_OR.X68'
+0000126C                           385      
+0000126C  4EB9 000012F0            386  DIVU_OR          JSR      GET_OPMODE  
+00001272                           387                                            
+00001272  B03C 0003                388                   CMP.B    #$3, D0        *if D0 holds 3, the opcode is DIVU
+00001276                           389                   
+00001276  6700 0008                390                   BEQ      DIVU_CODE
+0000127A                           391                   
+0000127A  4EF9 0000128C            392                   JMP      OR_CODE
+00001280                           393                   
+00001280                           394  DIVU_CODE  
+00001280                           395                   * OP_CODE message
+00001280  43F9 000013DC            396                   LEA      DIVU_MESSAGE, A1
+00001286  103C 000E                397                   MOVE.B   #14, D0
+0000128A  4E4F                     398                   TRAP #15
+0000128C                           399  
+0000128C                           400  OR_CODE    
+0000128C                           401                   * OP_CODE message
+0000128C  43F9 000013E2            402                   LEA      OR_MESSAGE, A1
+00001292  103C 000E                403                   MOVE.B   #14, D0
+00001296  4E4F                     404                   TRAP #15
+00001298                           405  
+00001298                           406  
+00001298                           407  
+00001298                           408  -------------------- end include --------------------
+00001298                           409          INCLUDE 'MULS_AND.X68'
+00001298                           410   
+00001298  4EB9 000012F0            411  MULS_AND         JSR GET_OPMODE
+0000129E                           412                                              
+0000129E  B03C 0003                413                   CMP.B    #$3, D0        *if D0 holds 3, the opcode is DIVU
+000012A2                           414                   
+000012A2  6700 0008                415                   BEQ      MULS_CODE
+000012A6                           416                   
+000012A6  4EF9 000012B8            417                   JMP      AND_CODE
+000012AC                           418                   
+000012AC                           419  MULS_CODE
+000012AC                           420                   * OP_CODE message
+000012AC  43F9 000013F0            421                   LEA MULS_MESSAGE, A1
+000012B2  103C 000E                422                   MOVE.B #14, D0
+000012B6  4E4F                     423                   TRAP #15
+000012B8                           424  
+000012B8                           425  AND_CODE
+000012B8                           426                   * OP_CODE message
+000012B8  43F9 000013F6            427                   LEA AND_MESSAGE, A1
+000012BE  103C 000E                428                   MOVE.B #14, D0
+000012C2  4E4F                     429                   TRAP #15
+000012C2  4E4F                     430  -------------------- end include --------------------
+000012C4                           431          INCLUDE 'ADD_ADDA.X68'
+000012C4                           432    
+000012C4                           433  ADD_ADDA  *at this point we know the first 4 bits are 1101 -> ADD or ADDA -> compare the destination opmode
+000012C4                           434                   
+000012C4  4EB9 000012F0            435                   JSR GET_OPMODE
+000012CA                           436                                              
+000012CA  B03C 0003                437                   CMP.B    #$3, D0        *if D0 holds 3, the opcode is ADDA
+000012CE                           438                   
+000012CE  6700 0008                439                   BEQ      ADDR_CODE
+000012D2                           440                   
+000012D2  4EF9 000012E4            441                   JMP      ADD_CODE
+000012D8                           442                   
+000012D8                           443  ADDR_CODE
+000012D8                           444                   * Welcome message
+Line 445 ERROR: Undefined symbol
+000012D8  43F9 004DBB8E            445                   LEA ADDR_MESSAGE, A1
+000012DE  103C 000E                446                   MOVE.B #14, D0
+000012E2  4E4F                     447                   TRAP #15
+000012E4                           448  
+000012E4                           449  ADD_CODE
+000012E4                           450                   * Welcome message
+000012E4  43F9 000013FB            451                   LEA ADD_MESSAGE, A1
+000012EA  103C 000E                452                   MOVE.B #14, D0
+000012EE  4E4F                     453                   TRAP #15
+000012F0                           454                   
+000012F0                           455  GET_OPMODE * get the op-code 
+000012F0                           456  
+000012F0  4280                     457                   CLR.L D0                *clear D0
+000012F2                           458                   
+000012F2  4281                     459                   CLR.L D1                *clear D1
+000012F4                           460                   
+000012F4  303C 0606                461                   MOVE.W  #example,D0     *D0 is the binary value to decode
+000012F8                           462  
+000012F8  123C 0008                463                   MOVE.B  #8,D1           *8 bits is the number of times to shift to the left to remove opcode & register #
+000012FC                           464  
+000012FC  E368                     465                   LSL.W   D1,D0           *Shift the bits 8 times -> D0 now removes the opcode & reg#
+000012FE                           466                   
+000012FE  123C 000E                467                   MOVE.B  #14,D1          *14 bits is the number of times to shift to hold the mode number
+00001302                           468  
+00001302  E268                     469                   LSR.W   D1,D0           *Shift the bits 14 times -> D0 now holds the mode number
+00001304                           470                   
+00001304  4E75                     471                   RTS 
+00001304  4E75                     472  -------------------- end include --------------------
+00001306                           473      
+00001306                           474  * Put program code here
+00001306                           475          INCLUDE 'EQU_Data.X68'
+00001306                           476  
+00001306                           477  
+00001306  =00000008                478  MAX_USER_INPUT  EQU 8 
+00001306                           479  
+00001306                           480  
+00001306  =00000606                481  example          EQU     %0000011000000110
+00001306                           482  
+00001306  =0000DE61                483  example1         EQU     %1101111001100001    * I made up bits 0 to 11      
+00001306                           484  
+00001306  =0000000C                485  shift            EQU     12                   * Shift 12 bits 
+00001306                           486  
+00001306  =00000000                487  mode_dn          EQU     %000
+00001306                           488  
+00001306  =00000001                489  mode_an          EQU     %001
+00001306                           490  
+00001306  =00000002                491  mode_ian         EQU     %010
+00001306                           492  
+00001306  =00000003                493  mode_pian        EQU     %011
+00001306                           494  
+00001306  =00000004                495  mode_pdan        EQU     %100
+00001306                           496  
+00001306  =00000005                497  mode_awd         EQU     %101
+00001306                           498  
+00001306  =00000006                499  mode_awi         EQU     %110
+00001306                           500  
+00001306  =00000007                501  mode_pcwd        EQU     %111
+00001306                           502  
+00001306  =00000002                503  xn_pcwd          EQU     %010
+00001306                           504  
+00001306  =00000007                505  mode_pcwi        EQU     %111
+00001306                           506  
+00001306  =00000003                507  xn_pcwi          EQU     %011
+00001306                           508  
+00001306  =00000007                509  mode_as          EQU     %111
+00001306                           510  
+00001306  =00000000                511  xn_as            EQU     %000
+00001306                           512  
+00001306  =00000007                513  mode_al          EQU     %111
+00001306                           514  
+00001306  =00000001                515  xn_al            EQU     %001
+00001306                           516  
+00001306  =00000007                517  mode_id          EQU     %111
+00001306                           518  
+00001306  =00000004                519  xn_id            EQU     %100
+00001306                           520  
+00001306  =00000000                521  size_byte        EQU     %00
+00001306                           522  
+00001306  =00000001                523  size_word        EQU     %01
+00001306                           524  
+00001306  =00000003                525  size_long        EQU     %11
+00001306                           526  
+00001306  =00000000                527  direction_right  EQU     %0
+00001306                           528  
+00001306  =00000001                529  direction_left   EQU     %1
+00001306                           530  
+00001306  =00000000                531  ro_immedate      EQU     %0
+00001306                           532  
+00001306  =00000001                533  ro_register      EQU     %1
+00001306                           534  
+00001306  =00000000                535  mode_m_dn        EQU     %0
+00001306                           536  
+00001306  =00000001                537  mode_m_pdan      EQU     %1
+00001306                           538  
+00001306                           539            
+00001306  =0000000D                540  CR  EQU $0D
+00001306                           541  
+00001306  =0000000A                542  LF  EQU $0A
+00001306                           543  
+00001306                           544  
+00001306                           545  -------------------- end include --------------------
+00001306                           546          INCLUDE 'MESSAGE_Data.X68' 
+00001306                           547  
+00001306  =0000000D                548  CR  EQU $0D
+00001306  =0000000A                549  LF  EQU $0A 
+00001306                           550  
+00001306= 57 65 6C 63 6F 6D ...    551  WELCOME_MESSAGE DC.B 'Welcome to our Team wild pokemon disassembly!!', CR, LF, 0
+00001337= 45 6E 74 65 72 20 ...    552  STARTING        DC.B 'Enter the starting location: ', 0
+00001355= 45 6E 74 65 72 20 ...    553  ENDING          DC.B 'Enter the ending locaiton: ', 0
+00001371                           554      
+00001371= 41 44 44 49 2E 00        555  ADDI_MESSAGE    DC.B 'ADDI.',0
+00001377= 4D 4F 56 45 41 2E 00     556  MOVEA_MESSAGE   DC.B 'MOVEA.',0
+0000137E= 4D 4F 56 45 2E 00        557  MOVE_MESSAGE    DC.B 'MOVE.',0
+00001384= 4E 4F 50 00              558  NOP_MESSAGE     DC.B 'NOP',0
+00001388= 4D 4F 56 45 4D 2E 00     559  MOVEM_MESSAGE   DC.B 'MOVEM.',0
+0000138F= 4A 53 52 00              560  JSR_MESSAGE     DC.B 'JSR',0
+00001393= 52 54 53 00              561  RTS_MESSAGE     DC.B 'RTS',0
+00001397= 43 4C 52 00              562  CLR_MESSAGE     DC.B 'CLR',0
+0000139B= 41 44 44 51 2E 00        563  ADDQ_MESSAGE    DC.B 'ADDQ.',0
+000013A1= 42 45 51 00              564  BEQ_MESSAGE     DC.B 'BEQ',0   *//
+000013A5= 42 4E 45 00              565  BNE_MESSAGE     DC.B 'BNE',0   *//
+000013A9= 42 43 53 00              566  BCS_MESSAGE     DC.B 'BCS',0   *//
+000013AD= 42 47 45 00              567  BGE_MESSAGE     DC.B 'BGE',0   *//
+000013B1= 42 47 54 00              568  BGT_MESSAGE     DC.B 'BGT',0   *//
+000013B5= 42 48 49 00              569  BHI_MESSAGE     DC.B 'BHI',0   *//
+000013B9= 42 4C 45 00              570  BLE_MESSAGE     DC.B 'BLE',0   *//
+000013BD= 42 4C 53 00              571  BLS_MESSAGE     DC.B 'BLS',0   *//
+000013C1= 42 4C 54 00              572  BLT_MESSAGE     DC.B 'BLT',0   *//
+000013C5= 42 4D 49 00              573  BMI_MESSAGE     DC.B 'BMI',0   *//
+000013C9= 42 50 4C 00              574  BPL_MESSAGE     DC.B 'BPL',0   *//
+000013CD= 42 56 43 00              575  BVC_MESSAGE     DC.B 'BVC',0   *//
+000013D1= 42 56 53 00              576  BVS_MESSAGE     DC.B 'BVS',0   *//
+000013D5                           577  
+000013D5= 4D 4F 56 45 51 2E 00     578  MOVEQ_MESSAGE   DC.B 'MOVEQ.',0
+000013DC= 44 49 56 55 2E 00        579  DIVU_MESSAGE    DC.B 'DIVU.',0
+000013E2= 4F 52 2E 00              580  OR_MESSAGE      DC.B 'OR.',0
+000013E6= 53 55 42 2E 00           581  SUB_MESSAGE     DC.B 'SUB.',0
+000013EB= 43 4D 50 2E 00           582  CMP_MESSAGE     DC.B 'CMP.',0
+000013F0= 4D 55 4C 53 2E 00        583  MULS_MESSAGE    DC.B 'MULS.',0
+000013F6= 41 4E 44 2E 00           584  AND_MESSAGE     DC.B 'AND.',0
+000013FB= 41 44 44 2E 00           585  ADD_MESSAGE     DC.B 'ADD.',0
+00001400= 41 44 44 41 2E 00        586  ADDA_MESSAGE    DC.B 'ADDA.',0
+00001406= 4C 53 4C 2E 00           587  LSL_MESSAGE     DC.B 'LSL.',0 *//
+0000140B= 41 53 4C 2E 00           588  ASL_MESSAGE     DC.B 'ASL.',0
+00001410= 52 4F 4C 2E 00           589  ROL_MESSAGE     DC.B 'ROL.',0
+00001415= 4C 53 52 2E 00           590  LSR_MESSAGE     DC.B 'LSR.',0 *//
+0000141A= 41 53 52 2E 00           591  ASR_MESSAGE     DC.B 'ASR.',0
+0000141F= 52 4F 52 2E 00           592  ROR_MESSAGE     DC.B 'ROR.',0
+00001424= 42 20 20 20 20 00        593  SIZE_B_PRINT    DC.B 'B    ',0
+0000142A= 57 20 20 20 20 00        594  SIZE_W_PRINT    DC.B 'W    ',0
+00001430= 4C 20 20 20 20 00        595  SIZE_L_PRINT    DC.B 'L    ',0
+00001436= 23 00                    596  POUND_SIGN      DC.B '#',0
+00001438= 24 00                    597  HEX_SIGN        DC.B '$',0
+0000143A                           598  
+0000143A= 44 00                    599  D_REGISTER      DC.B 'D',0
+0000143C= 41 00                    600  A_REGISTER      DC.B 'A',0
+0000143E= 28 41 00                 601  IA_START        DC.B '(A',0
+00001441= 29 00                    602  IA_END          DC.B ')',0
+00001443= 28 41 00                 603  A_PI_START      DC.B '(A',0
+00001446= 29 2B 00                 604  A_PI_END        DC.B ')+',0
+00001449= 2D 28 41 00              605  A_PD_START      DC.B '-(A',0
+0000144D= 29 00                    606  A_PD_END        DC.B ')',0
+0000144F                           607  
+0000144F                           608  
+0000144F                           609  
+0000144F                           610  
+0000144F                           611  
+0000144F                           612  
+0000144F                           613  -------------------- end include --------------------
+0000144F                           614      
+00001450  FFFF FFFF                615          SIMHALT             ; halt simulator
+00001454                           616      
+00001454                           617          INCLUDE 'DS_Data.X68'
+00001454                           618  
+00001454                           619  STARTING_ADDR   DS.L 1
+00001458                           620  
+00001458                           621  ENDING_ADDR     DS.L 1
+00001458                           622  -------------------- end include --------------------
+0000145C                           623  
+0000145C                           624  * Put variables and constants here
+0000145C                           625  
+0000145C                           626          END    START        ; last line of source
+
+1 error detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDA_MESSAGE        1400
+ADDI                11D6
+ADDI_CHECK_ID       122A
+ADDI_MESSAGE        1371
+ADDI_PRINTOUT       1252
+ADDQ_MESSAGE        139B
+ADDR_CODE           12D8
+ADD_ADDA            12C4
+ADD_CODE            12E4
+ADD_MESSAGE         13FB
+ADD_START           100C
+ANDS                1036
+AND_CODE            12B8
+AND_MESSAGE         13F6
+ASL_MESSAGE         140B
+ASR_MESSAGE         141A
+A_PD_END            144D
+A_PD_START          1449
+A_PI_END            1446
+A_PI_START          1443
+A_REGISTER          143C
+BCS_MESSAGE         13A9
+BEQ_MESSAGE         13A1
+BGE_MESSAGE         13AD
+BGT_MESSAGE         13B1
+BHI_MESSAGE         13B5
+BLE_MESSAGE         13B9
+BLS_MESSAGE         13BD
+BLT_MESSAGE         13C1
+BMI_MESSAGE         13C5
+BNE_MESSAGE         13A5
+BPL_MESSAGE         13C9
+BVC_MESSAGE         13CD
+BVS_MESSAGE         13D1
+CHAR                1100
+CLEAR               1040
+CLR_MESSAGE         1397
+CMP_MESSAGE         13EB
+CODE0000            1196
+CODE0001            119A
+CODE0010            119E
+CODE0011            11A2
+CODE0100            11A6
+CODE0101            11AA
+CODE0110            11AE
+CODE0111            11B2
+CODE1000            11B6
+CODE1001            11BA
+CODE1010            11BE
+CODE1011            11C2
+CODE1100            11C6
+CODE1101            11CA
+CODE1110            11CE
+CODE1111            11D2
+COMPARES            1050
+CONVERT_STRING      10DE
+CR                  D
+DATA1               1012
+DATA5               1018
+DIRECTION_LEFT      1
+DIRECTION_RIGHT     0
+DIVU_CODE           1280
+DIVU_MESSAGE        13DC
+DIVU_OR             126C
+D_REGISTER          143A
+ENDCONV             1122
+ENDING              1355
+ENDING_ADDR         1458
+ENDING_MESSAGE      1098
+ERROR               1122
+EXAMPLE             606
+EXAMPLE1            DE61
+GET_OPMODE          12F0
+GO_THROUGH_MEMORY   1124
+HEX_SIGN            1438
+IA_END              1441
+IA_START            143E
+JMPLABEL            1052
+JMP_TABLE           1136
+JSR_MESSAGE         138F
+LF                  A
+LOAD_ADDR           1042
+LSL_MESSAGE         1406
+LSR_MESSAGE         1415
+MAX_USER_INPUT      8
+MODE_AL             7
+MODE_AN             1
+MODE_AS             7
+MODE_AWD            5
+MODE_AWI            6
+MODE_DN             0
+MODE_IAN            2
+MODE_ID             7
+MODE_M_DN           0
+MODE_M_PDAN         1
+MODE_PCWD           7
+MODE_PCWI           7
+MODE_PDAN           4
+MODE_PIAN           3
+MOVEA_MESSAGE       1377
+MOVEM_MESSAGE       1388
+MOVEQ_MESSAGE       13D5
+MOVES               1016
+MOVE_MESSAGE        137E
+MULS_AND            1298
+MULS_CODE           12AC
+MULS_MESSAGE        13F0
+MULTIPLY            1058
+NEXT_STEP           105C
+NOP_MESSAGE         1384
+NUMBER              10F0
+OR_CODE             128C
+OR_MESSAGE          13E2
+POUND_SIGN          1436
+ROLLS               103E
+ROL_MESSAGE         1410
+ROR_MESSAGE         141F
+RO_IMMEDATE         0
+RO_REGISTER         1
+RTS_MESSAGE         1393
+SHIFT               C
+SHIFTS              103C
+SIZE_BYTE           0
+SIZE_B_PRINT        1424
+SIZE_LONG           3
+SIZE_L_PRINT        1430
+SIZE_WORD           1
+SIZE_W_PRINT        142A
+START               1000
+STARTING            1337
+STARTING_ADDR       1454
+STARTING_MESSAGE    1068
+STORE_ADDR          1110
+SUBTRACTS           1010
+SUB_MESSAGE         13E6
+WELCOME_MESSAGE     1306
+XN_AL               1
+XN_AS               0
+XN_ID               4
+XN_PCWD             2
+XN_PCWI             3
