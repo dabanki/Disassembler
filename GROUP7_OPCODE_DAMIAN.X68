@@ -7,6 +7,10 @@
     ORG    $1000
 START:                  ; first instruction of program
 
+BEQ      ADDR_CODE
+                 
+                 JMP      ADD_CODE
+                 
 SHIFTS           CLR.L D0
 
                  CLR.L D1
@@ -29,6 +33,12 @@ SHIFTS           CLR.L D0
                  
                  BRA ASD                *if it is not equal to 1 or 3, it is arithmetic shift
                  
+ADDR_CODE  
+     *need to error check 
+
+ADD_CODE 
+    *JMP ADD_ADDA
+    *need to error check 
 
 LSD              CLR.L D0               *still need to do checks, since an asd shift could still be a possibility
                  
@@ -46,8 +56,38 @@ LSD              CLR.L D0               *still need to do checks, since an asd s
                  
                  BNE ASD                *if the two bits are not 3, it is an arithmetic shift
                  
+                 MOVE.L #example, D0
+                 
+                 LSL.W  #7, D0
+                 
+                 MOVE.B #15, D1
+                 
+                 LSR.W  D1, D0
+                 
+                 CMP.B  #1, D0
+                 
+                 BEQ LSL
+                 
+                 BRA LSR
+                 
+
+LSL
+                 LEA LSL_MESSAGE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
                  BRA DONE
 
+LSR
+                 LEA LSR_MESSAGE, A1    
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 BRA DONE
 
 ROD              CLR.L D0               *same check as logical shift, since an arithmetic shift could still be possible
                  
@@ -65,9 +105,69 @@ ROD              CLR.L D0               *same check as logical shift, since an a
                  
                  BNE ASD
                  
-                 BRA DONE       
+                 MOVE.L #example, D0
                  
-ASD              BRA DONE               *add error handling
+                 LSL.W  #7, D0
+                 
+                 MOVE.B #15, D1
+                 
+                 LSR.W  D1, D0
+                 
+                 CMP.B  #1, D0
+                 
+                 BEQ ROL
+                 
+                 BRA ROR
+
+ROL
+                 LEA ROL_MESSAGE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 BRA DONE
+
+ROR       
+                 LEA ROR_MESSAGE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 BRA DONE
+                 
+ASD              MOVE.L #example, D0
+                 
+                 LSL.W  #7, D0
+                 
+                 MOVE.B #15, D1
+                 
+                 LSR.W  D1, D0
+                 
+                 CMP.B  #1, D0
+                 
+                 BEQ ASL
+                 
+                 BRA ASR
+                 
+ASL
+                 LEA ASL_MESSAGE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 BRA DONE
+
+ASR                
+                 LEA ASR_MESSAGE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 BRA DONE
 
 
     SIMHALT             ; halt simulator
@@ -75,6 +175,7 @@ ASD              BRA DONE               *add error handling
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~

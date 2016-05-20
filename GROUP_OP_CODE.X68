@@ -49,9 +49,9 @@ jmp_table      JMP         code0000
 
 *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
 
-code0000       BRA         ADDI * we don't have it now
+code0000       *BRA         ADDI * we don't have it now
 
-code0001       STOP        #$2700 * BRA         MOVEB
+code0001       BRA         MOVEB
 
 code0010       STOP        #$2700 * BRA         MOVEW
 
@@ -80,6 +80,7 @@ code1101       STOP        #$2700 * BRA         ADD_ADDA
 code1110       STOP        #$2700 * BRA        SHIFTS
 
 code1111       STOP        #$2700 * It's gonna be error
+
 
 
 *~Font name~Courier New~

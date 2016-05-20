@@ -1,0 +1,94 @@
+00005000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/20/2016 2:45:47 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00005000                             7      ORG    $5000
+00005000                             8  
+00005000                             9  * put your data that you want printed into D5, and use D4 as the size of your data
+00005000                            10  START 
+00005000                            11  
+00005000                            12  HEX_TO_ASCII      
+00005000  4283                      13       CLR.L      D3
+00005002                            14      
+00005002  2A3C 00ABCDEF             15       MOVE.L     #$ABCDEF, D5
+00005008                            16       
+00005008                            17  LOOP     
+00005008  2C05                      18       MOVE.L     D5, D6                  * put the data in a register so we can manipulate it
+0000500A                            19       
+0000500A  4282                      20       CLR.L      D2
+0000500C                            21       
+0000500C  143C 001C                 22       MOVE.B     #28, D2
+00005010                            23  
+00005010  E4AE                      24       LSR.L      D2, D6                  * shift out everything to the right of the last nibble, we print backwards so it shows up the correct order in the console
+00005012                            25       
+00005012  BC3C 000A                 26       CMP.B      #10, D6
+00005016                            27       
+00005016  6C00 0006                 28       BGE        LETTER                  * determine if a letter or a number
+0000501A                            29       
+0000501A  6000 000C                 30       BRA        NUMBER
+0000501E                            31       
+0000501E                            32  LETTER
+0000501E  0606 0037                 33       ADD.B      #55, D6
+00005022                            34       
+00005022  1206                      35       MOVE.B     D6, D1                  * add the amount to change to ascii and move to D1 to prepare for printing
+00005024                            36       
+00005024  6000 000C                 37       BRA        PRINTOUT_NIBBLE
+00005028                            38  
+00005028                            39  NUMBER     
+00005028  0606 0030                 40       ADD.B      #48, D6
+0000502C                            41       
+0000502C  1206                      42       MOVE.B     D6, D1                  * add the amount to change to ascii and move to D1 to prepare for printing
+0000502E                            43       
+0000502E  6000 0002                 44       BRA        PRINTOUT_NIBBLE
+00005032                            45  
+00005032                            46  
+00005032                            47  PRINTOUT_NIBBLE
+00005032  E98D                      48      LSL.L      #4, D5                   * shift out the nibble you just read from the source
+00005034                            49      
+00005034  BC3C 0030                 50      CMP.B      #$30, D6
+00005038                            51  
+00005038  67CE                      52      BEQ        LOOP             
+0000503A                            53      
+0000503A  103C 0006                 54      MOVE.B     #6, D0                      * use TRAP task #6 to print a single character from D1  
+0000503E                            55      
+0000503E  4E4F                      56      TRAP #15
+00005040                            57      
+00005040  5203                      58      ADD.B      #1, D3                   * add to the counter in D3
+00005042                            59       
+00005042  B63C 0008                 60      CMP.B      #8, D3                   * compare to the counter to check if you are done
+00005046                            61       
+00005046  6700 0004                 62      BEQ        DONE
+0000504A                            63          
+0000504A  60BC                      64      BRA LOOP                            * continue the loop and print next nibble
+0000504C                            65       
+0000504C                            66            
+0000504C                            67  DONE
+0000504C                            68  
+0000504C                            69  * Put program code here
+0000504C                            70  
+0000504C  FFFF FFFF                 71      SIMHALT             ; halt simulator
+00005050                            72  
+00005050                            73  * Put variables and constants here
+00005050                            74  
+00005050                            75      END    START       ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+DONE                504C
+HEX_TO_ASCII        5000
+LETTER              501E
+LOOP                5008
+NUMBER              5028
+PRINTOUT_NIBBLE     5032
+START               5000
