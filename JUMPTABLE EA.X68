@@ -25,9 +25,8 @@
 
                MULU        #6,D6            *Form offset     
 
-               JSR         0(A0,D6)         *Jump indirect with index
-
-                    
+               JMP         0(A0,D6)         *Jump indirect with index
+ 
 
 jmp_table_ea   JMP         code000
 
@@ -341,6 +340,7 @@ DONE
                END   $400 
 
  
+
 
 
 
