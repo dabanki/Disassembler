@@ -11,7 +11,7 @@
 
 
 *start 
-               *MOVE.B       #%00, D5
+               *MOVE.B       #%00, D5         *SIZE
               
                *MOVE.B       #%111,D6         *MODE
                
@@ -341,6 +341,8 @@ DONE
                *END   $400 
 
  
+
+
 
 
 

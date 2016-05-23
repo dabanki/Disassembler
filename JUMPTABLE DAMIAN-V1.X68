@@ -90,7 +90,7 @@ code0011       BRA         MOVEW
 
 code0100       STOP        #$2700
 
-code0101       STOP        #$2700
+code0101       STOP        ADDQ   * Subroutine for ADDQ
 
 code0110       STOP        #$2700
 
@@ -98,7 +98,7 @@ code0111       STOP        #$2700
 
 code1000       STOP        #$2700
 
-code1001       STOP        #$2700
+code1001       STOP        SUB    * Subroutine for SUB
 
 code1010       STOP        #$2700
 
@@ -114,7 +114,7 @@ code1010       STOP        #$2700
 
  
 
-code1011       BRA        code1011
+code1011       BRA        CMP  * Subroutuine for CMP
 
 code1100       STOP        #$2700
 
@@ -700,6 +700,7 @@ PRINTOUT_MOVE_EA
             *INCLUDE 'MESSAGE_Data.X68'
             INCLUDE 'JUMPTABLE EA.X68'
                END   $400 
+
 
 
 
