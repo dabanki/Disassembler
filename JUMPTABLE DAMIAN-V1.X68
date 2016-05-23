@@ -1,6 +1,6 @@
 stack            EQU      $A000
 
-example          EQU      %1110011001001010    * I made up bits 0 to 11      
+example          EQU      %0010111000001010    * I made up bits 0 to 11      
 
 shift            EQU     12                    * Shift 12 bits 
 
@@ -84,9 +84,9 @@ code0000       STOP        #$2700
 
 code0001       BRA         MOVEB
 
-code0010       BRA         MOVEW
+code0010       BRA         MOVEL
 
-code0011       BRA         MOVEL
+code0011       BRA         MOVEW
 
 code0100       STOP        #$2700
 
@@ -440,7 +440,7 @@ PRINTOUT_COUNT
                  
                  TRAP #15                  * print out the amount that the ea is being shifted by
                  
-                 LEA SPACE, A1
+                 LEA COMMA, A1
                  
                  MOVE.B #14, D0
                  
@@ -478,7 +478,7 @@ PRINTOUT_REGISTER
                  
                  JSR PRINT_EA                  * to print out the data register
                  
-                 LEA SPACE, A1
+                 LEA COMMA, A1
                  
                  MOVE.B #14, D0
                  
@@ -547,7 +547,7 @@ MOVEB            LEA MOVE_MESSAGE, A1   * printing out the opcode and size
                  
                  TRAP #15               * done printing opcode and size
                  
-                 BRA DONE
+                 BRA PRINTOUT_MOVE_EA
 
 MOVEW            CLR.L D0
                  
@@ -577,7 +577,7 @@ MOVEW            CLR.L D0
                  
                  TRAP #15               * done printing opcode and size
                     
-                 BRA DONE
+                 BRA PRINTOUT_MOVE_EA
               
 
 MOVEL            CLR.L D0
@@ -608,7 +608,7 @@ MOVEL            CLR.L D0
                  
                  TRAP #15               * done printing opcode and size
                  
-                 BRA DONE
+                 BRA PRINTOUT_MOVE_EA
                  
                  
 MOVEAW           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
@@ -623,7 +623,7 @@ MOVEAW           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
                  
                  TRAP #15               * done printing out opcode and size
                  
-                 BRA DONE
+                 BRA PRINTOUT_MOVE_EA
 
 MOVEAL           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
 
@@ -637,7 +637,64 @@ MOVEAL           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
                  
                  TRAP #15               * done printing out opcode and size
                  
-                 BRA DONE               
+                 BRA PRINTOUT_MOVE_EA
+
+PRINTOUT_MOVE_EA
+                 MOVE.L #example, D0
+                 
+                 LSL.W #4, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D7          * getting the register of the first ea
+                 
+                 MOVE.L #example, D0
+                 
+                 LSL.W #7, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D6          * getting the mode of the first ea
+                 
+                 JSR PRINT_EA
+                 
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #10, D1
+                 
+                 LSL.W D1, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D6          * getting the mode of the second ea
+                 
+                 LEA COMMA, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSL.W D1, D0
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D7          * getting the register of the second ea
+                 
+                 JSR PRINT_EA
+                 
+                 BRA DONE
+
+                    
             
 
             *INCLUDE 'MESSAGE_Data.X68'
