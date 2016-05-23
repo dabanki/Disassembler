@@ -57,6 +57,7 @@ SIZE_L_PRINT    DC.B 'L    ',0
 POUND_SIGN      DC.B '#',0
 HEX_SIGN        DC.B '$',0
 PERIOD          DC.B '.',0
+SPACE           DC.B '  ',0
 
 *ea
 * data register

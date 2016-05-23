@@ -1,6 +1,6 @@
 stack            EQU      $A000
 
-example          EQU      %1110111100101000    * I made up bits 0 to 11      
+example          EQU      %1110011001001010    * I made up bits 0 to 11      
 
 shift            EQU     12                    * Shift 12 bits 
 
@@ -34,7 +34,7 @@ start            LEA     stack,SP        *Load the SP
 
                MULU        #6,D0       *Form offset     
 
-               JSR          0(A0,D0)   *Jump indirect with index
+               JSR         0(A0,D0)   *Jump indirect with index
 
                     
 
@@ -396,6 +396,12 @@ ASD_MEMORY
                  BRA DONE
                  
 PRINTOUT_REGISTER_SHIFTS_EA
+                 LEA PERIOD, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+
                  MOVE.L #example, D0
                  
                  MOVE.B #10, D1
@@ -424,9 +430,9 @@ PRINTOUT_COUNT
                  
                  LSL.W #4, D0
                  
-                 MOVE.B #12, D1
+                 MOVE.B #13, D1
                  
-                 LSL.W D1, D0
+                 LSR.W D1, D0
                  
                  MOVE.B D0, D1
                  
@@ -434,7 +440,28 @@ PRINTOUT_COUNT
                  
                  TRAP #15                  * print out the amount that the ea is being shifted by
                  
+                 LEA SPACE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #13, D1                * to print out the ea that is being shifted
+                 
+                 LSL.W D1, D0
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D7
+                 
+                 MOVE.B #%000, D6              * we know it is a data register
+                 
+                 JSR PRINT_EA
+                 
                  BRA DONE
+                 
 
 PRINTOUT_REGISTER
                  MOVE.L #example, D0
@@ -451,12 +478,36 @@ PRINTOUT_REGISTER
                  
                  JSR PRINT_EA                  * to print out the data register
                  
-                 JSR PRINTOUT_MEMORY_SHIFTS_EA * to print out the ea that is being shifted
+                 LEA SPACE, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+                 
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #13, D1                * to print out the ea that is being shifted
+                 
+                 LSL.W D1, D0
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D7
+                 
+                 MOVE.B #%000, D6              * we know it is a data register
+                 
+                 JSR PRINT_EA
                  
                  BRA DONE
                                  
 
 PRINTOUT_MEMORY_SHIFTS_EA   * gets the mode and register of the memory ea, and prints it out
+                 LEA PERIOD, A1
+                 
+                 MOVE.B #14, D0
+                 
+                 TRAP #15
+
                  MOVE.L #example, D0
                  
                  MOVE.B #10, D1
@@ -592,6 +643,7 @@ MOVEAL           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
             *INCLUDE 'MESSAGE_Data.X68'
             INCLUDE 'JUMPTABLE EA.X68'
                END   $400 
+
 
 
 
