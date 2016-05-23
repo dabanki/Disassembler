@@ -1,4 +1,4 @@
- ORG     $400
+ *ORG     $400
 
 * D6 is mode, D7 is register 
 * Dn, An, (An), (An)+, -(An)
@@ -11,15 +11,16 @@
 
 
 *start 
-               MOVE.B       #%00, D5
+               *MOVE.B       #%00, D5
               
-               MOVE.B       #%111,D6         *MODE
+               *MOVE.B       #%111,D6         *MODE
                
-               MOVE.B       #%100,D7         *REGISTER
+               *MOVE.B       #%100,D7         *REGISTER
                
-               MOVE.L       #$4000, A5
+               *MOVE.L       #$4000, A5
 
-               MOVE.B       #$0040, (A5)   
+               *MOVE.B       #$0040, (A5)  
+PRINT_EA 
                
                LEA     jmp_table_ea,A0      *Index into the table
 
@@ -337,7 +338,7 @@ DONE
      
         
     
-               END   $400 
+               *END   $400 
 
  
 

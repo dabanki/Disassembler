@@ -1,8 +1,8 @@
 stack            EQU      $A000
 
-example          EQU      %1110111001100111    * I made up bits 0 to 11      
+example          EQU      %1110111100101000    * I made up bits 0 to 11      
 
-shift            EQU     12                   * Shift 12 bits 
+shift            EQU     12                    * Shift 12 bits 
 
  
 
@@ -208,50 +208,52 @@ LSD              CLR.L D0               *still need to do checks, since an asd s
                  
 
 LSL
-                 MOVE.L #example, D0
-                 
-                 LSL.W #7, D0
-                 
-                 MOVE.B #13, D1
-                 
-                 LSR.W D1, D0
-                 
-                 CMP.B  #%11, D0
-                 
-                 BEQ LSL_MEMORY
-                 
-                 LEA LSL_MESSAGE, A1
+                 LEA LSL_MESSAGE, A1    * print message
                  
                  MOVE.B #14, D0
                  
                  TRAP #15
+            
+                 MOVE.L #example, D0
                  
-                 BRA DONE
-
-LSL_MEMORY
+                 LSL.W #8, D0
+                 
+                 MOVE.B #14, D1
+                 
+                 LSR.W D1, D0
+                 
+                 CMP.B  #%11, D0        * check to see if it is memory and not register shift
+                 
+                 BEQ LSD_MEMORY
+                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
 
 LSR              
-                 MOVE.L #example, D0
-                 
-                 LSL.W #7, D0
-                 
-                 MOVE.B #13, D1
-                 
-                 LSR.W D1, D0
-                 
-                 CMP.B  #%11, D0
-                 
-                 BEQ LSR_MEMORY
-                 
-                 LEA LSR_MESSAGE, A1    
+                 LEA LSR_MESSAGE, A1            * print message
                  
                  MOVE.B #14, D0
                  
                  TRAP #15
+        
+                 MOVE.L #example, D0
+                 
+                 LSL.W #8, D0
+                 
+                 MOVE.B #14, D1
+                 
+                 LSR.W D1, D0
+                 
+                 CMP.B  #%11, D0            * check to see if memory shift
+                 
+                 BEQ LSD_MEMORY
+                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
+                 
+LSD_MEMORY
+                 JSR    PRINTOUT_MEMORY_SHIFTS_EA
                  
                  BRA DONE
-                 
-LSR_MEMORY
+            
 
 ROD              CLR.L D0               *same check as logical shift, since an arithmetic shift could still be possible
                  
@@ -284,27 +286,25 @@ ROD              CLR.L D0               *same check as logical shift, since an a
                  BRA ROR
 
 ROL              
-                 MOVE.L #example, D0
-                 
-                 LSL.W #7, D0
-                 
-                 MOVE.B #13, D1
-                 
-                 LSR.W D1, D0
-                 
-                 CMP.B  #%11, D0
-                 
-                 BEQ ROL_MEMORY
-
                  LEA ROL_MESSAGE, A1
                  
                  MOVE.B #14, D0
                  
                  TRAP #15
-                 
-                 BRA DONE
 
-ROL_MEMORY
+                 MOVE.L #example, D0
+                 
+                 LSL.W #8, D0
+                 
+                 MOVE.B #14, D1
+                 
+                 LSR.W D1, D0
+                 
+                 CMP.B  #%11, D0            * check to see if its memory shift
+                 
+                 BEQ ROD_MEMORY
+                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
 
 ROR       
                  LEA ROR_MESSAGE, A1
@@ -315,19 +315,23 @@ ROR
                  
                  MOVE.L #example, D0
                  
-                 LSL.W #7, D0
+                 LSL.W #8, D0
                  
-                 MOVE.B #13, D1
+                 MOVE.B #14, D1
                  
                  LSR.W D1, D0
                  
-                 CMP.B  #%11, D0
+                 CMP.B  #%11, D0            * check to see if its memory shift
                  
-                 BEQ ROR_MEMORY
+                 BEQ ROD_MEMORY
+                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
+
+ROD_MEMORY       
+                 JSR    PRINTOUT_MEMORY_SHIFTS_EA
                  
                  BRA DONE
-
-ROR_MEMORY       
+                 
                  
 ASD              MOVE.L #example, D0
                  
@@ -352,19 +356,18 @@ ASL
                  
                  MOVE.L #example, D0
                  
-                 LSL.W #7, D0
+                 LSL.W #8, D0
                  
-                 MOVE.B #13, D1
+                 MOVE.B #14, D1
                  
                  LSR.W D1, D0
                  
-                 CMP.B  #%11, D0
+                 CMP.B  #%11, D0            * check to see if its memory shift
                  
-                 BEQ ASL_MEMORY
+                 BEQ ASD_MEMORY
                  
-                 BRA DONE
-                 
-ASL_MEMORY                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
+                                  
 
 ASR              
                  LEA ASR_MESSAGE, A1
@@ -375,19 +378,111 @@ ASR
                  
                  MOVE.L #example, D0
                  
-                 LSL.W #7, D0
+                 LSL.W #8, D0
+                 
+                 MOVE.B #14, D1
+                 
+                 LSR.W D1, D0
+                 
+                 CMP.B  #%11, D0            * check to see if its memory shift
+                 
+                 BEQ ASD_MEMORY
+                 
+                 BRA PRINTOUT_REGISTER_SHIFTS_EA
+
+ASD_MEMORY
+                 JSR    PRINTOUT_MEMORY_SHIFTS_EA
+                 
+                 BRA DONE
+                 
+PRINTOUT_REGISTER_SHIFTS_EA
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #10, D1
+                 
+                 LSL.W D1, D0
+                 
+                 MOVE.B #15, D1
+                 
+                 LSR.W D1, D0
+                 
+                 CMP.B #1, D0
+                 
+                 BEQ PRINTOUT_REGISTER
+                 
+                 BRA PRINTOUT_COUNT
+
+                 
+PRINTOUT_COUNT
+                 LEA POUND_SIGN, A1
+
+                 MOVE.B #14, D0
+
+                 TRAP #15     
+               
+                 MOVE.L #example, D0
+                 
+                 LSL.W #4, D0
+                 
+                 MOVE.B #12, D1
+                 
+                 LSL.W D1, D0
+                 
+                 MOVE.B D0, D1
+                 
+                 MOVE.B #3, D0
+                 
+                 TRAP #15                  * print out the amount that the ea is being shifted by
+                 
+                 BRA DONE
+
+PRINTOUT_REGISTER
+                 MOVE.L #example, D0
+                 
+                 LSL.W #4, D0
                  
                  MOVE.B #13, D1
                  
                  LSR.W D1, D0
                  
-                 CMP.B  #%11, D0
+                 MOVE.B D0, D7
                  
-                 BEQ ASR_MEMORY
+                 MOVE.B #%000, D6
+                 
+                 JSR PRINT_EA                  * to print out the data register
+                 
+                 JSR PRINTOUT_MEMORY_SHIFTS_EA * to print out the ea that is being shifted
                  
                  BRA DONE
+                                 
 
-ASR_MEMORY
+PRINTOUT_MEMORY_SHIFTS_EA   * gets the mode and register of the memory ea, and prints it out
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #10, D1
+                 
+                 LSL.W D1, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D6
+                 
+                 MOVE.L #example, D0
+                 
+                 MOVE.B #13, D1
+                 
+                 LSL.W D1, D0
+                 
+                 LSR.W D1, D0
+                 
+                 MOVE.B D0, D7
+                 
+                 JSR PRINT_EA
+                 
+                 RTS
+                
               
 MOVEB            LEA MOVE_MESSAGE, A1   * printing out the opcode and size
 
