@@ -1,462 +1,857 @@
-00001000 Starting Address
+00000000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 5/18/16 7:34:22 PM
+Created On: 5/23/16 4:42:09 PM
 
-00000000                             1  * ORG     $400
+00000000                             1   *ORG     $400
 00000000                             2  
 00000000                             3  * D6 is mode, D7 is register 
 00000000                             4  * Dn, An, (An), (An)+, -(An)
 00000000                             5  * Jumps based on mode
-00000000                             6  
-00000000                             7  * Consider the next instruction. Why do we have to multiply the index 
-00000000                             8  
-00000000                             9  * by 6? How many bytes does a single jump table entry require? 
-00000000                            10  *example          EQU     %0000011000000110
-00000000                            11  *                 MOVEA.W    #$7000, A5
-00000000                            12  *                 MOVE.L    #$10342035, (A5)
-00000000                            13  
-00000000                            14  *start 
-00000000                            15  *               MOVE.B      #%010,D6         *MODE
-00000000                            16  *               
-00000000                            17  *               MOVE.B      #%111,D7         *REGISTER
-00000000                            18  
-00000000                            19  print_ea
-00000000                            20                 
-00000000  41F9 0000000E             21                 LEA     jmp_table_ea,A0      *Index into the table
-00000006                            22  
-00000006  CCFC 0006                 23                 MULU        #6,D6            *Form offset     
-0000000A                            24  
-0000000A  4EF0 6000                 25                 JMP         0(A0,D6)         *Jump indirect with index
-0000000E                            26  
-0000000E                            27                      
-0000000E                            28  
-0000000E  4EF9 00000044             29  jmp_table_ea   JMP         code000
-00000014                            30  
-00000014  4EF9 00000048             31                 JMP         code001
-0000001A                            32  
-0000001A  4EF9 0000004C             33                 JMP         code010
-00000020                            34  
-00000020  4EF9 00000050             35                 JMP         code011
-00000026                            36  
-00000026  4EF9 00000054             37                 JMP         code100
-0000002C                            38  
-0000002C  4EF9 00000058             39                 JMP         code101
-00000032                            40  
-00000032  4EF9 0000005C             41                 JMP         code110
-00000038                            42  
-00000038  4EF9 00000060             43                 JMP         code111
-0000003E                            44                 
-0000003E  4EF9 00000064             45                 JMP         RETURN
-00000044                            46          
-00000044                            47  
-00000044                            48   
-00000044                            49  
-00000044                            50  *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
-00000044                            51  
-00000044                            52   
-00000044                            53  
-00000044                            54   
-00000044                            55  
-00000044  6000 0020                 56  code000       BRA         DATA_REGISTER
-00000048                            57  
-00000048  6000 003C                 58  code001       BRA         ADDRESS_REGISTER
-0000004C                            59  
-0000004C  6000 0054                 60  code010       BRA         INDIRECT_ADDRESS
-00000050                            61  
-00000050  6000 007A                 62  code011       BRA         ADDRESS_PI    * post increment
-00000054                            63  
-00000054  6000 00A0                 64  code100       BRA         ADDRESS_PD    * pre decrement
-00000058                            65  
-00000058  6000 00C6                 66  code101       BRA         ADDRESS_W_DISPLACEMENT
-0000005C                            67  
-0000005C  6000 00C2                 68  code110       BRA         ADDRESS_W_INDEX
-00000060                            69  
-00000060  6000 00BE                 70  code111       BRA         GROUP_111
-00000064                            71  
-00000064  4E75                      72  RETURN        RTS
-00000066                            73  
-00000066                            74   
-00000066                            75  DATA_REGISTER
-00000066                            76  
-00000066  43F9 000002D6             77              LEA D_REGISTER, A1
-0000006C                            78              
-0000006C  4280                      79              CLR.L D0
-0000006E                            80              
-0000006E  103C 000E                 81              MOVE.B #14, D0
-00000072                            82              
-00000072  4E4F                      83              TRAP #15                * print out 'D' for data register
-00000074                            84              
-00000074  4281                      85              CLR.L D1
-00000076                            86              
-00000076  1207                      87              MOVE.B D7, D1
-00000078                            88              
-00000078  103C 0003                 89              MOVE.B #3, D0           * print out the number in the register
-0000007C                            90              
-0000007C  4E4F                      91              TRAP #15
-0000007E                            92              
-0000007E  1C3C 0008                 93              MOVE.B  #8, D6
-00000082                            94              
-00000082  6000 011C                 95              BRA DONE
-00000086                            96              
-00000086                            97  
-00000086                            98  ADDRESS_REGISTER
-00000086  43F9 000002D8             99              LEA A_REGISTER, A1
-0000008C                           100              
-0000008C  4280                     101              CLR.L D0
-0000008E                           102              
-0000008E  103C 000E                103              MOVE.B #14, D0          * print out the 'A' for address register
-00000092                           104              
-00000092  4E4F                     105              TRAP #15
-00000094                           106              
-00000094  4281                     107              CLR.L D1
-00000096                           108              
-00000096  1207                     109              MOVE.B D7, D1
-00000098                           110              
-00000098  103C 0003                111              MOVE.B #3, D0
-0000009C                           112              
-0000009C  4E4F                     113              TRAP #15                * print out the value in the data register
-0000009E                           114  
-0000009E  6000 0100                115              BRA DONE
-000000A2                           116              
-000000A2                           117  INDIRECT_ADDRESS
-000000A2  43F9 000002DA            118              LEA IA_START, A1
-000000A8                           119              
-000000A8  4280                     120              CLR.L D0
-000000AA                           121              
-000000AA  103C 000E                122              MOVE.B #14, D0          * print out the '(A' for start of indirect address register
-000000AE                           123              
-000000AE  4E4F                     124              TRAP #15
-000000B0                           125              
-000000B0  4281                     126              CLR.L D1
-000000B2                           127              
-000000B2  1207                     128              MOVE.B D7, D1
-000000B4                           129              
-000000B4  103C 0003                130              MOVE.B #3, D0
-000000B8                           131              
-000000B8  4E4F                     132              TRAP #15                * print out the value in the data register
-000000BA                           133              
-000000BA  43F9 000002DD            134              LEA IA_END, A1
-000000C0                           135  
-000000C0  4280                     136              CLR.L D0
-000000C2                           137              
-000000C2  103C 000E                138              MOVE.B #14, D0          * print out the ')' for end of post increment address register
-000000C6                           139              
-000000C6  4E4F                     140              TRAP #15
-000000C8                           141              
-000000C8  6000 00D6                142              BRA DONE
-000000CC                           143  
-000000CC                           144  ADDRESS_PI
-000000CC  43F9 000002DF            145              LEA A_PI_START, A1
-000000D2                           146              
-000000D2  4280                     147              CLR.L D0
-000000D4                           148              
-000000D4  103C 000E                149              MOVE.B #14, D0          * print out the '(A' for start of post increment address register
-000000D8                           150              
-000000D8  4E4F                     151              TRAP #15
-000000DA                           152              
-000000DA  4281                     153              CLR.L D1
-000000DC                           154              
-000000DC  1207                     155              MOVE.B D7, D1
-000000DE                           156              
-000000DE  103C 0003                157              MOVE.B #3, D0
-000000E2                           158              
-000000E2  4E4F                     159              TRAP #15                * print out the value in the data register
-000000E4                           160              
-000000E4  43F9 000002E2            161              LEA A_PI_END, A1
-000000EA                           162  
-000000EA  4280                     163              CLR.L D0
-000000EC                           164              
-000000EC  103C 000E                165              MOVE.B #14, D0          * print out the ')+' for end of post increment address register
-000000F0                           166     
-000000F0  4E4F                     167              TRAP #15
-000000F2                           168              
-000000F2  6000 00AC                169              BRA DONE  
-000000F6                           170         
-000000F6                           171  ADDRESS_PD
-000000F6                           172  
-000000F6  43F9 000002E5            173              LEA A_PD_START, A1
-000000FC                           174              
-000000FC  4280                     175              CLR.L D0
-000000FE                           176              
-000000FE  103C 000E                177              MOVE.B #14, D0          * print out the '-(A' for start of pre decrement address register
-00000102                           178              
-00000102  4E4F                     179              TRAP #15
-00000104                           180              
-00000104  4281                     181              CLR.L D1
-00000106                           182              
-00000106  1207                     183              MOVE.B D7, D1
-00000108                           184              
-00000108  103C 0003                185              MOVE.B #3, D0
-0000010C                           186              
-0000010C  4E4F                     187              TRAP #15                * print out the value in the data register
-0000010E                           188              
-0000010E  43F9 000002E9            189              LEA A_PD_END, A1
-00000114                           190  
-00000114  4280                     191              CLR.L D0
-00000116                           192              
-00000116  103C 000E                193              MOVE.B #14, D0          * print out the ')-' for end of pre decrement
-0000011A                           194  
-0000011A  4E4F                     195              TRAP #15
-0000011C                           196              
-0000011C  6000 0082                197              BRA DONE
-00000120                           198              
-00000120                           199  ADDRESS_W_DISPLACEMENT
-00000120                           200  
-00000120                           201  ADDRESS_W_INDEX
-00000120                           202  
-00000120                           203  GROUP_111
-00000120                           204  
-00000120  41F9 0000012E            205                 LEA     jmp_table_ea_111,A0    *Index into the table
-00000126                           206  
-00000126  CEFC 0006                207                 MULU        #6,D7       *Form offset     
-0000012A                           208  
-0000012A  4EF0 7000                209                 JMP         0(A0,D7)   *Jump indirect with index
-0000012E                           210                 
-0000012E                           211  jmp_table_ea_111   
-0000012E  4EF9 00000154            212                 JMP         reg000
-00000134                           213  
-00000134  4EF9 00000158            214                 JMP         reg001
-0000013A                           215  
-0000013A  4EF9 0000014C            216                 JMP         reg010
-00000140                           217  
-00000140  4EF9 00000150            218                 JMP         reg011
-00000146                           219  
-00000146  4EF9 0000015C            220                 JMP         reg100
-0000014C                           221          
-0000014C                           222  
-0000014C  6000 0012                223  reg010       BRA         PC_W_DISPLACEMENT
-00000150                           224  
-00000150  6000 000E                225  reg011       BRA         PC_W_INDEX
-00000154                           226  
-00000154  6000 000A                227  reg000       BRA         ABSOLUTE_SHORT
-00000158                           228  
-00000158  6000 0024                229  reg001       BRA         ABSOLUTE_LONG
-0000015C                           230  
-0000015C  6000 003E                231  reg100       BRA         IMMEDIATE
-00000160                           232  
-00000160                           233  
-00000160                           234  PC_W_DISPLACEMENT
+00000000                             6  * USING A5 AS THE ADDRESS REGISTER HOLDING CURRENT ADDRESS OF PROGRESS
+00000000                             7  
+00000000                             8  * Consider the next instruction. Why do we have to multiply the index 
+00000000                             9  
+00000000                            10  * by 6? How many bytes does a single jump table entry require? 
+00000000                            11  
+00000000                            12  
+00000000                            13  *start 
+00000000                            14                 *MOVE.B       #%00, D5         *SIZE
+00000000                            15                
+00000000                            16                 *MOVE.B       #%111,D6         *MODE
+00000000                            17                 
+00000000                            18                 *MOVE.B       #%100,D7         *REGISTER
+00000000                            19                 
+00000000                            20                 *MOVE.L       #$4000, A5
+00000000                            21  
+00000000                            22                 *MOVE.B       #$0040, (A5)  
+00000000                            23  PRINT_EA 
+00000000                            24                 
+00000000  41F9 0000000E             25                 LEA     jmp_table_ea,A0      *Index into the table
+00000006                            26  
+00000006  CCFC 0006                 27                 MULU        #6,D6            *Form offset     
+0000000A                            28  
+0000000A  4EF0 6000                 29                 JMP         0(A0,D6)         *Jump indirect with index
+0000000E                            30   
+0000000E                            31  
+0000000E  4EF9 0000003E             32  jmp_table_ea   JMP         code000
+00000014                            33  
+00000014  4EF9 00000042             34                 JMP         code001
+0000001A                            35  
+0000001A  4EF9 00000046             36                 JMP         code010
+00000020                            37  
+00000020  4EF9 0000004A             38                 JMP         code011
+00000026                            39  
+00000026  4EF9 0000004E             40                 JMP         code100
+0000002C                            41  
+0000002C  4EF9 00000052             42                 JMP         code101
+00000032                            43  
+00000032  4EF9 00000056             44                 JMP         code110
+00000038                            45  
+00000038  4EF9 0000005A             46                 JMP         code111
+0000003E                            47          
+0000003E                            48  
+0000003E                            49   
+0000003E                            50  
+0000003E                            51  *The following subroutines will get filled in as you decode the instructions . For *now, just exit gracefully.
+0000003E                            52  
+0000003E                            53   
+0000003E                            54  
+0000003E                            55   
+0000003E                            56  
+0000003E  6000 001E                 57  code000       BRA         DATA_REGISTER
+00000042                            58  
+00000042  6000 0036                 59  code001       BRA         ADDRESS_REGISTER
+00000046                            60  
+00000046  6000 004E                 61  code010       BRA         INDIRECT_ADDRESS
+0000004A                            62  
+0000004A  6000 0074                 63  code011       BRA         ADDRESS_PI    * post increment
+0000004E                            64  
+0000004E  6000 009A                 65  code100       BRA         ADDRESS_PD    * pre decrement
+00000052                            66  
+00000052  6000 00C0                 67  code101       BRA         ADDRESS_W_DISPLACEMENT
+00000056                            68  
+00000056  6000 00C0                 69  code110       BRA         ADDRESS_W_INDEX
+0000005A                            70  
+0000005A  6000 00C0                 71  code111       BRA         GROUP_111
+0000005E                            72  
+0000005E                            73   
+0000005E                            74  DATA_REGISTER
+0000005E                            75  
+0000005E  43F9 000004C9             76              LEA D_REGISTER, A1
+00000064                            77              
+00000064  4280                      78              CLR.L D0
+00000066                            79              
+00000066  103C 000E                 80              MOVE.B #14, D0
+0000006A                            81              
+0000006A  4E4F                      82              TRAP #15                * print out 'D' for data register
+0000006C                            83              
+0000006C  4281                      84              CLR.L D1
+0000006E                            85              
+0000006E  1207                      86              MOVE.B D7, D1
+00000070                            87              
+00000070  103C 0003                 88              MOVE.B #3, D0           * print out the number in the register
+00000074                            89              
+00000074  4E4F                      90              TRAP #15
+00000076                            91              
+00000076  6000 0316                 92              BRA DONE
+0000007A                            93              
+0000007A                            94  
+0000007A                            95  ADDRESS_REGISTER
+0000007A  43F9 000004CB             96              LEA A_REGISTER, A1
+00000080                            97              
+00000080  4280                      98              CLR.L D0
+00000082                            99              
+00000082  103C 000E                100              MOVE.B #14, D0          * print out the 'A' for address register
+00000086                           101              
+00000086  4E4F                     102              TRAP #15
+00000088                           103              
+00000088  4281                     104              CLR.L D1
+0000008A                           105              
+0000008A  1207                     106              MOVE.B D7, D1
+0000008C                           107              
+0000008C  103C 0003                108              MOVE.B #3, D0
+00000090                           109              
+00000090  4E4F                     110              TRAP #15                * print out the value in the data register
+00000092                           111  
+00000092  6000 02FA                112              BRA DONE
+00000096                           113              
+00000096                           114  INDIRECT_ADDRESS
+00000096  43F9 000004CD            115              LEA IA_START, A1
+0000009C                           116              
+0000009C  4280                     117              CLR.L D0
+0000009E                           118              
+0000009E  103C 000E                119              MOVE.B #14, D0          * print out the '(A' for start of indirect address register
+000000A2                           120              
+000000A2  4E4F                     121              TRAP #15
+000000A4                           122              
+000000A4  4281                     123              CLR.L D1
+000000A6                           124              
+000000A6  1207                     125              MOVE.B D7, D1
+000000A8                           126              
+000000A8  103C 0003                127              MOVE.B #3, D0
+000000AC                           128              
+000000AC  4E4F                     129              TRAP #15                * print out the value in the data register
+000000AE                           130              
+000000AE  43F9 000004D0            131              LEA IA_END, A1
+000000B4                           132  
+000000B4  4280                     133              CLR.L D0
+000000B6                           134              
+000000B6  103C 000E                135              MOVE.B #14, D0          * print out the ')' for end of post increment address register
+000000BA                           136              
+000000BA  4E4F                     137              TRAP #15
+000000BC                           138              
+000000BC  6000 02D0                139              BRA DONE
+000000C0                           140  
+000000C0                           141  ADDRESS_PI
+000000C0  43F9 000004D2            142              LEA A_PI_START, A1
+000000C6                           143              
+000000C6  4280                     144              CLR.L D0
+000000C8                           145              
+000000C8  103C 000E                146              MOVE.B #14, D0          * print out the '(A' for start of post increment address register
+000000CC                           147              
+000000CC  4E4F                     148              TRAP #15
+000000CE                           149              
+000000CE  4281                     150              CLR.L D1
+000000D0                           151              
+000000D0  1207                     152              MOVE.B D7, D1
+000000D2                           153              
+000000D2  103C 0003                154              MOVE.B #3, D0
+000000D6                           155              
+000000D6  4E4F                     156              TRAP #15                * print out the value in the data register
+000000D8                           157              
+000000D8  43F9 000004D5            158              LEA A_PI_END, A1
+000000DE                           159  
+000000DE  4280                     160              CLR.L D0
+000000E0                           161              
+000000E0  103C 000E                162              MOVE.B #14, D0          * print out the ')+' for end of post increment address register
+000000E4                           163     
+000000E4  4E4F                     164              TRAP #15
+000000E6                           165              
+000000E6  6000 02A6                166              BRA DONE  
+000000EA                           167         
+000000EA                           168  ADDRESS_PD
+000000EA                           169  
+000000EA  43F9 000004D8            170              LEA A_PD_START, A1
+000000F0                           171              
+000000F0  4280                     172              CLR.L D0
+000000F2                           173              
+000000F2  103C 000E                174              MOVE.B #14, D0          * print out the '-(A' for start of pre decrement address register
+000000F6                           175              
+000000F6  4E4F                     176              TRAP #15
+000000F8                           177              
+000000F8  4281                     178              CLR.L D1
+000000FA                           179              
+000000FA  1207                     180              MOVE.B D7, D1
+000000FC                           181              
+000000FC  103C 0003                182              MOVE.B #3, D0
+00000100                           183              
+00000100  4E4F                     184              TRAP #15                * print out the value in the data register
+00000102                           185              
+00000102  43F9 000004DC            186              LEA A_PD_END, A1
+00000108                           187  
+00000108  4280                     188              CLR.L D0
+0000010A                           189              
+0000010A  103C 000E                190              MOVE.B #14, D0          * print out the ')-' for end of pre decrement
+0000010E                           191  
+0000010E  4E4F                     192              TRAP #15
+00000110                           193              
+00000110  6000 027C                194              BRA DONE
+00000114                           195              
+00000114                           196  ADDRESS_W_DISPLACEMENT
+00000114  6000 0278                197              BRA DONE
+00000118                           198  
+00000118                           199  ADDRESS_W_INDEX
+00000118  6000 0274                200              BRA DONE
+0000011C                           201  
+0000011C                           202  GROUP_111
+0000011C                           203  
+0000011C  41F9 0000012A            204                 LEA         jmp_table_ea_111,A0    *Index into the table
+00000122                           205  
+00000122  CEFC 0006                206                 MULU        #6,D7       *Form offset     
+00000126                           207  
+00000126  4EF0 7000                208                 JMP         0(A0,D7)   *Jump indirect with index
+0000012A                           209                 
+0000012A                           210  jmp_table_ea_111   
+0000012A  4EF9 00000150            211                 JMP         reg000
+00000130                           212  
+00000130  4EF9 00000154            213                 JMP         reg001
+00000136                           214  
+00000136  4EF9 00000148            215                 JMP         reg010
+0000013C                           216  
+0000013C  4EF9 0000014C            217                 JMP         reg011
+00000142                           218  
+00000142  4EF9 00000158            219                 JMP         reg100
+00000148                           220          
+00000148                           221  
+00000148  6000 0012                222  reg010       BRA         PC_W_DISPLACEMENT
+0000014C                           223  
+0000014C  6000 0012                224  reg011       BRA         PC_W_INDEX
+00000150                           225  
+00000150  6000 0012                226  reg000       BRA         ABSOLUTE_SHORT
+00000154                           227  
+00000154  6000 002C                228  reg001       BRA         ABSOLUTE_LONG
+00000158                           229  
+00000158  6000 0046                230  reg100       BRA         IMMEDIATE
+0000015C                           231  
+0000015C                           232  
+0000015C                           233  PC_W_DISPLACEMENT
+0000015C  6000 0230                234              BRA DONE
 00000160                           235  
 00000160                           236  PC_W_INDEX
-00000160                           237  
-00000160                           238  ABSOLUTE_SHORT
-00000160  43F9 000002D4            239              LEA         HEX_SIGN, A1
-00000166                           240              
-00000166  103C 000E                241              MOVE.B      #14, D0
-0000016A                           242              
-0000016A  4E4F                     243              TRAP #15
-0000016C                           244              
-0000016C  4281                     245              CLR.L       D1
-0000016E                           246              
-0000016E  321D                     247              MOVE.W      (A5)+, D1
-00000170                           248              
-00000170  103C 000F                249              MOVE.B      #15, D0
-00000174                           250              
-00000174  143C 0010                251              MOVE.B      #16, D2
-00000178                           252              
-00000178  4E4F                     253              TRAP #15
-0000017A                           254              
-0000017A  6000 0024                255              BRA DONE  
-0000017E                           256  
-0000017E                           257  
-0000017E                           258  ABSOLUTE_LONG
-0000017E  43F9 000002D4            259              LEA         HEX_SIGN, A1
-00000184                           260              
-00000184  103C 000E                261              MOVE.B      #14, D0
-00000188                           262              
-00000188  4E4F                     263              TRAP #15
-0000018A                           264              
-0000018A  4281                     265              CLR.L       D1
-0000018C                           266              
-0000018C  221D                     267              MOVE.L      (A5)+, D1
-0000018E                           268              
-0000018E  103C 000F                269              MOVE.B      #15, D0
-00000192                           270              
-00000192  143C 0010                271              MOVE.B      #16, D2
-00000196                           272              
-00000196  4E4F                     273              TRAP #15
-00000198                           274                          
-00000198  6000 0006                275              BRA DONE  
-0000019C                           276  
-0000019C                           277  
-0000019C                           278  IMMEDIATE
-0000019C                           279  
-0000019C  6000 0002                280              BRA DONE  
-000001A0                           281  
-000001A0                           282  DONE
-000001A0  4E75                     283      RTS
-000001A2                           284      
-000001A2                           285    INCLUDE 'MESSAGE_Data.X68'
-000001A2                           286  
-000001A2  =0000000D                287  CR  EQU $0D
-000001A2  =0000000A                288  LF  EQU $0A 
-000001A2                           289  
-000001A2= 57 65 6C 63 6F 6D ...    290  WELCOME_MESSAGE DC.B 'Welcome to our Team wild pokemon disassembly!!', CR, LF, 0
-000001D3= 45 6E 74 65 72 20 ...    291  STARTING        DC.B 'Enter the starting location: ', 0
-000001F1= 45 6E 74 65 72 20 ...    292  ENDING          DC.B 'Enter the ending locaiton: ', 0
-0000020D                           293      
-0000020D= 41 44 44 49 2E 00        294  ADDI_MESSAGE    DC.B 'ADDI.',0
-00000213= 4D 4F 56 45 41 2E 00     295  MOVEA_MESSAGE   DC.B 'MOVEA.',0
-0000021A= 4D 4F 56 45 2E 00        296  MOVE_MESSAGE    DC.B 'MOVE.',0
-00000220= 4E 4F 50 00              297  NOP_MESSAGE     DC.B 'NOP',0
-00000224= 4D 4F 56 45 4D 2E 00     298  MOVEM_MESSAGE   DC.B 'MOVEM.',0
-0000022B= 4A 53 52 00              299  JSR_MESSAGE     DC.B 'JSR',0
-0000022F= 52 54 53 00              300  RTS_MESSAGE     DC.B 'RTS',0
-00000233= 43 4C 52 00              301  CLR_MESSAGE     DC.B 'CLR',0
-00000237= 41 44 44 51 2E 00        302  ADDQ_MESSAGE    DC.B 'ADDQ.',0
-0000023D= 42 45 51 00              303  BEQ_MESSAGE     DC.B 'BEQ',0   *//
-00000241= 42 4E 45 00              304  BNE_MESSAGE     DC.B 'BNE',0   *//
-00000245= 42 43 53 00              305  BCS_MESSAGE     DC.B 'BCS',0   *//
-00000249= 42 47 45 00              306  BGE_MESSAGE     DC.B 'BGE',0   *//
-0000024D= 42 47 54 00              307  BGT_MESSAGE     DC.B 'BGT',0   *//
-00000251= 42 48 49 00              308  BHI_MESSAGE     DC.B 'BHI',0   *//
-00000255= 42 4C 45 00              309  BLE_MESSAGE     DC.B 'BLE',0   *//
-00000259= 42 4C 53 00              310  BLS_MESSAGE     DC.B 'BLS',0   *//
-0000025D= 42 4C 54 00              311  BLT_MESSAGE     DC.B 'BLT',0   *//
-00000261= 42 4D 49 00              312  BMI_MESSAGE     DC.B 'BMI',0   *//
-00000265= 42 50 4C 00              313  BPL_MESSAGE     DC.B 'BPL',0   *//
-00000269= 42 56 43 00              314  BVC_MESSAGE     DC.B 'BVC',0   *//
-0000026D= 42 56 53 00              315  BVS_MESSAGE     DC.B 'BVS',0   *//
-00000271                           316  
-00000271= 4D 4F 56 45 51 2E 00     317  MOVEQ_MESSAGE   DC.B 'MOVEQ.',0
-00000278= 44 49 56 55 2E 00        318  DIVU_MESSAGE    DC.B 'DIVU.',0
-0000027E= 4F 52 2E 00              319  OR_MESSAGE      DC.B 'OR.',0
-00000282= 53 55 42 2E 00           320  SUB_MESSAGE     DC.B 'SUB.',0
-00000287= 43 4D 50 2E 00           321  CMP_MESSAGE     DC.B 'CMP.',0
-0000028C= 4D 55 4C 53 2E 00        322  MULS_MESSAGE    DC.B 'MULS.',0
-00000292= 41 4E 44 2E 00           323  AND_MESSAGE     DC.B 'AND.',0
-00000297= 41 44 44 2E 00           324  ADD_MESSAGE     DC.B 'ADD.',0
-0000029C= 41 44 44 41 2E 00        325  ADDA_MESSAGE    DC.B 'ADDA.',0
-000002A2= 4C 53 4C 2E 00           326  LSL_MESSAGE     DC.B 'LSL.',0 *//
-000002A7= 41 53 4C 2E 00           327  ASL_MESSAGE     DC.B 'ASL.',0
-000002AC= 52 4F 4C 2E 00           328  ROL_MESSAGE     DC.B 'ROL.',0
-000002B1= 4C 53 52 2E 00           329  LSR_MESSAGE     DC.B 'LSR.',0 *//
-000002B6= 41 53 52 2E 00           330  ASR_MESSAGE     DC.B 'ASR.',0
-000002BB= 52 4F 52 2E 00           331  ROR_MESSAGE     DC.B 'ROR.',0
-000002C0= 42 20 20 20 20 00        332  SIZE_B_PRINT    DC.B 'B    ',0
-000002C6= 57 20 20 20 20 00        333  SIZE_W_PRINT    DC.B 'W    ',0
-000002CC= 4C 20 20 20 20 00        334  SIZE_L_PRINT    DC.B 'L    ',0
-000002D2= 23 00                    335  POUND_SIGN      DC.B '#',0
-000002D4= 24 00                    336  HEX_SIGN        DC.B '$',0
-000002D6                           337  
-000002D6= 44 00                    338  D_REGISTER      DC.B 'D',0
-000002D8= 41 00                    339  A_REGISTER      DC.B 'A',0
-000002DA= 28 41 00                 340  IA_START        DC.B '(A',0
-000002DD= 29 00                    341  IA_END          DC.B ')',0
-000002DF= 28 41 00                 342  A_PI_START      DC.B '(A',0
-000002E2= 29 2B 00                 343  A_PI_END        DC.B ')+',0
-000002E5= 2D 28 41 00              344  A_PD_START      DC.B '-(A',0
-000002E9= 29 00                    345  A_PD_END        DC.B ')',0
-000002EB= 2C 20 00                 346  COMMA           DC.B ', ',0
-000002EE                           347  
-000002EE                           348  
-000002EE                           349  
-000002EE                           350  
-000002EE                           351  
-000002EE                           352  
-000002EE                           353  
-000002EE                           354  -------------------- end include --------------------
-000002EE                           355       
-000002EE                           356  
-000002EE                           357   
-000002EE                           358  
-000002EE                           359  
-000002EE                           360  
-000002EE                           361  
-000002EE                           362  
-Line 363 WARNING: END directive missing, starting address not set
+00000160  6000 022C                237              BRA DONE
+00000164                           238  
+00000164                           239  ABSOLUTE_SHORT
+00000164  43F9 000004C2            240              LEA         HEX_SIGN, A1
+0000016A                           241              
+0000016A  103C 000E                242              MOVE.B      #14, D0
+0000016E                           243              
+0000016E  4E4F                     244              TRAP #15
+00000170                           245              
+00000170  4281                     246              CLR.L       D1
+00000172                           247              
+00000172  221D                     248              MOVE.L      (A5)+, D1
+00000174                           249              
+00000174  103C 000F                250              MOVE.B      #15, D0
+00000178                           251              
+00000178  143C 0010                252              MOVE.B      #16, D2
+0000017C                           253              
+0000017C  4E4F                     254              TRAP #15
+0000017E                           255              
+0000017E  6000 020E                256              BRA DONE  
+00000182                           257  
+00000182                           258  
+00000182                           259  ABSOLUTE_LONG
+00000182  43F9 000004C2            260              LEA         HEX_SIGN, A1
+00000188                           261              
+00000188  103C 000E                262              MOVE.B      #14, D0
+0000018C                           263              
+0000018C  4E4F                     264              TRAP #15
+0000018E                           265              
+0000018E  4281                     266              CLR.L       D1
+00000190                           267              
+00000190  221D                     268              MOVE.L      (A5)+, D1
+00000192                           269              
+00000192  103C 000F                270              MOVE.B      #15, D0
+00000196                           271              
+00000196  143C 0010                272              MOVE.B      #16, D2
+0000019A                           273              
+0000019A  4E4F                     274              TRAP #15
+0000019C                           275                          
+0000019C  6000 01F0                276              BRA DONE  
+000001A0                           277  
+000001A0                           278  
+000001A0                           279  IMMEDIATE
+000001A0  43F9 000004C0            280              LEA     POUND_SIGN, A1
+000001A6                           281              
+000001A6  103C 000E                282              MOVE.B  #14, D0
+000001AA                           283              
+000001AA  4E4F                     284              TRAP #15
+000001AC                           285              
+000001AC  43F9 000004C2            286              LEA     HEX_SIGN, A1
+000001B2                           287              
+000001B2  4E4F                     288              TRAP #15
+000001B4                           289              
+000001B4  BA3C 0000                290              CMP.B   #%00, D5
+000001B8                           291              
+000001B8  6700 000E                292              BEQ     IMMEDIATE_B
+000001BC                           293              
+000001BC  BA3C 0001                294              CMP.B   #%01, D5
+000001C0                           295              
+000001C0  6700 0014                296              BEQ     IMMEDIATE_W
+000001C4                           297              
+000001C4  6000 001E                298              BRA     IMMEDIATE_L
+000001C8                           299              
+000001C8                           300  IMMEDIATE_B
+000001C8  4285                     301              CLR.L       D5
+000001CA                           302     
+000001CA  1A1D                     303              MOVE.B      (A5)+, D5
+000001CC                           304              
+000001CC  4EB9 000004E1            305              JSR         HEX_TO_ASCII
+000001D2                           306              
+000001D2  6000 01BA                307              BRA DONE
+000001D6                           308  
+000001D6                           309  IMMEDIATE_W
+000001D6  4285                     310              CLR.L       D5
+000001D8                           311  
+000001D8  3A1D                     312              MOVE.W      (A5)+, D5
+000001DA                           313              
+000001DA  4EB9 000004E1            314              JSR         HEX_TO_ASCII
+000001E0                           315              
+000001E0                           316              *MOVE.B      #15, D0
+000001E0                           317              
+000001E0                           318              *MOVE.B      #16, D2
+000001E0                           319              
+000001E0                           320              *TRAP #15 
+000001E0                           321              
+000001E0  6000 01AC                322              BRA DONE        
+000001E4                           323  
+000001E4                           324  IMMEDIATE_L 
+000001E4  4285                     325              CLR.L       D5
+000001E6                           326      
+000001E6  4EB9 000004E1            327              JSR         HEX_TO_ASCII
+000001EC                           328              
+000001EC  4E4F                     329              TRAP #15
+000001EE                           330              
+000001EE  6000 019E                331              BRA DONE
+000001F2                           332  
+000001F2                           333  SUB
+000001F2                           334  
+000001F2  43F9 00000470            335      LEA SUB_MESSAGE, A1  *print SUB
+000001F8                           336                   
+000001F8  103C 000E                337      MOVE.B #14, D0
+000001FC                           338                   
+000001FC  4E4F                     339      TRAP #15
+000001FE                           340      
+000001FE  4EF9 00000216            341      JMP SUB_CMP
+00000204                           342  
+00000204                           343  CMP
+00000204  43F9 00000475            344      LEA CMP_MESSAGE, A1  *print CMP
+0000020A                           345                   
+0000020A  103C 000E                346      MOVE.B #14, D0
+0000020E                           347                   
+0000020E  4E4F                     348      TRAP #15
+00000210                           349      
+00000210  4EF9 00000216            350      JMP SUB_CMP
+00000216                           351  
+00000216                           352  SUB_CMP
+00000216                           353  
+Line 354 ERROR: Undefined symbol
+00000216  203C 004DBB8E            354      MOVE.L #example, D0
+0000021C                           355      
+0000021C  123C 0008                356      MOVE.B  #8,D1     
+00000220                           357  
+00000220  E368                     358      LSL.W   D1,D0
+00000222                           359                   
+00000222  123C 000E                360      MOVE.B  #14,D1
+00000226                           361  
+00000226  E268                     362      LSR.W   D1,D0  *DO now holds size
+00000228                           363                                              
+00000228  B03C 0002                364      CMP.B    #$2, D0        *if D0 holds 3, size is L
+0000022C                           365      
+Line 366 ERROR: Undefined symbol
+0000022C  4EF9 004DBB8E            366      JMP      SUBL
+00000232                           367                   
+00000232  B03C 0001                368      CMP.B    #$1, D0        *if D0 holds 3, size is W
+00000236                           369                                   
+Line 370 ERROR: Undefined symbol
+00000236  4EF9 004DBB8E            370      JMP      SUBW
+0000023C                           371  
+Line 372 ERROR: Undefined symbol
+0000023C  4EF9 004DBB8E            372      JMP      SUBB
+00000242                           373  
+00000242                           374  SUB_CMP_B  *Print B
+00000242                           375  
+00000242  43F9 000004AE            376      LEA SIZE_B_PRINT, A1  *print B
+00000248                           377                   
+00000248  103C 000E                378      MOVE.B #14, D0
+0000024C                           379                   
+0000024C  4E4F                     380      TRAP #15
+0000024E                           381      
+0000024E  1A3C 0000                382      MOVE.B #%00, D5
+00000252                           383      
+00000252  4EF9 00000284            384      JMP PRINT_SUB_CMP
+00000258                           385      
+00000258                           386  SUB_CMP_W  *Print W
+00000258                           387  
+00000258  43F9 000004B4            388      LEA SIZE_W_PRINT, A1  *print W
+0000025E                           389                   
+0000025E  103C 000E                390      MOVE.B #14, D0
+00000262                           391                   
+00000262  4E4F                     392      TRAP #15
+00000264                           393      
+00000264  1A3C 0001                394      MOVE.B #%01, D5
+00000268                           395  
+00000268  4EF9 00000284            396      JMP PRINT_SUB_CMP
+0000026E                           397  
+0000026E                           398  SUB_CMP_L   *Print L
+0000026E                           399  
+0000026E  43F9 000004BA            400      LEA SIZE_L_PRINT, A1  *print L
+00000274                           401                   
+00000274  103C 000E                402      MOVE.B #14, D0
+00000278                           403                   
+00000278  4E4F                     404      TRAP #15
+0000027A                           405  
+0000027A  1A3C 0002                406      MOVE.B #%10, D5
+0000027E                           407      
+0000027E  4EF9 00000284            408      JMP PRINT_SUB_CMP
+00000284                           409      
+00000284                           410  PRINT_SUB_CMP
+00000284                           411  
+00000284  3C3C 0000                412      MOVE.W #$000, D6
+00000288                           413     
+Line 414 ERROR: Undefined symbol
+00000288  203C 004DBB8E            414      MOVE.L #example, D0
+0000028E                           415  
+0000028E  123C 0004                416      MOVE.B  #4,D1     
+00000292                           417  
+00000292  E368                     418      LSL.W   D1,D0
+00000294                           419                   
+00000294  123C 000D                420      MOVE.B  #13,D1
+00000298                           421  
+00000298  E268                     422      LSR.W   D1,D0  *D0 now holds Dn
+0000029A                           423                                              
+0000029A  3E00                     424      MOVE.W D0, D7 *D6 holds Dn
+0000029C                           425      
+0000029C  4EB8 0000                426      JSR PRINT_EA
+000002A0                           427      
+000002A0  4286                     428      CLR.L D6
+000002A2                           429      
+000002A2  4287                     430      CLR.L D7
+000002A4                           431      
+Line 432 ERROR: Undefined symbol
+000002A4  203C 004DBB8E            432      MOVE.L #example, D0
+000002AA                           433  
+000002AA  123C 000A                434      MOVE.B  #10,D1     
+000002AE                           435  
+000002AE  E368                     436      LSL.W   D1,D0
+000002B0                           437                   
+000002B0  123C 000D                438      MOVE.B  #13,D1
+000002B4                           439  
+000002B4  E268                     440      LSR.W   D1,D0  *D0 now holds MODE
+000002B6                           441                                              
+000002B6  3C00                     442      MOVE.W D0, D6 *D6 holds mode
+000002B8                           443      
+Line 444 ERROR: Undefined symbol
+000002B8  203C 004DBB8E            444      MOVE.L #example, D0
+000002BE                           445  
+000002BE  123C 000D                446      MOVE.B  #13,D1     
+000002C2                           447  
+000002C2  E368                     448      LSL.W   D1,D0
+000002C4                           449                   
+000002C4  123C 000D                450      MOVE.B  #13,D1
+000002C8                           451  
+000002C8  E268                     452      LSR.W   D1,D0  *D0 now holds Register
+000002CA                           453                                              
+000002CA  3E00                     454      MOVE.W D0, D7 *D6 holds Register   
+000002CC                           455      
+000002CC  4EB8 0000                456      JSR PRINT_EA
+000002D0                           457  
+000002D0  6000 00BC                458      BRA DONE
+000002D4                           459  
+000002D4                           460  
+000002D4                           461  ADDQ
+000002D4                           462  
+000002D4  43F9 00000425            463      LEA ADDQ_MESSAGE, A1  *print ADDQ
+000002DA                           464                   
+000002DA  103C 000E                465      MOVE.B #14, D0
+000002DE                           466                   
+000002DE  4E4F                     467      TRAP #15
+000002E0                           468      
+Line 469 ERROR: Undefined symbol
+000002E0  203C 004DBB8E            469      MOVE.L #example, D0
+000002E6                           470      
+000002E6  123C 0008                471      MOVE.B  #8,D1     
+000002EA                           472  
+000002EA  E368                     473      LSL.W   D1,D0
+000002EC                           474                   
+000002EC  123C 000E                475      MOVE.B  #14,D1
+000002F0                           476  
+000002F0  E268                     477      LSR.W   D1,D0  *DO now holds size
+000002F2                           478                                              
+000002F2  B03C 0002                479      CMP.B    #$2, D0        *if D0 holds 3, size is L
+000002F6                           480      
+000002F6  4EF9 00000338            481      JMP      ADDQL
+000002FC                           482                   
+000002FC  B03C 0001                483      CMP.B    #$1, D0        *if D0 holds 3, size is W
+00000300                           484                                   
+00000300  4EF9 00000322            485      JMP      ADDQW
+00000306                           486  
+00000306  4EF9 0000030C            487      JMP      ADDQB
+0000030C                           488  
+0000030C                           489  ADDQB  *Print B
+0000030C                           490  
+0000030C  43F9 000004AE            491      LEA SIZE_B_PRINT, A1  *print B
+00000312                           492                   
+00000312  103C 000E                493      MOVE.B #14, D0
+00000316                           494                   
+00000316  4E4F                     495      TRAP #15
+00000318                           496      
+00000318  1A3C 0000                497      MOVE.B #%00, D5
+0000031C                           498      
+0000031C  4EF9 0000034E            499      JMP PRINTADDQ
+00000322                           500      
+00000322                           501  ADDQW  *Print W
+00000322                           502  
+00000322  43F9 000004B4            503      LEA SIZE_W_PRINT, A1  *print W
+00000328                           504                   
+00000328  103C 000E                505      MOVE.B #14, D0
+0000032C                           506                   
+0000032C  4E4F                     507      TRAP #15
+0000032E                           508      
+0000032E  1A3C 0001                509      MOVE.B #%01, D5
+00000332                           510  
+00000332  4EF9 0000034E            511      JMP PRINTADDQ
+00000338                           512  
+00000338                           513  ADDQL   *Print L
+00000338                           514  
+00000338  43F9 000004BA            515      LEA SIZE_L_PRINT, A1  *print L
+0000033E                           516                   
+0000033E  103C 000E                517      MOVE.B #14, D0
+00000342                           518                   
+00000342  4E4F                     519      TRAP #15
+00000344                           520  
+00000344  1A3C 0002                521      MOVE.B #%10, D5
+00000348                           522      
+00000348  4EF9 0000034E            523      JMP PRINTADDQ
+0000034E                           524      
+0000034E                           525  PRINTADDQ
+0000034E                           526  
+0000034E  3C3C 0111                527      MOVE.W #$111, D6
+00000352                           528      
+00000352  3E3C 0100                529      MOVE.W #$100, D7
+00000356                           530  
+00000356  4EB8 0000                531      JSR PRINT_EA
+0000035A                           532      
+0000035A  4286                     533      CLR.L D6
+0000035C                           534      
+0000035C  4287                     535      CLR.L D7
+0000035E                           536      
+Line 537 ERROR: Undefined symbol
+0000035E  203C 004DBB8E            537      MOVE.L #example, D0
+00000364                           538  
+00000364  123C 000A                539      MOVE.B  #10,D1     
+00000368                           540  
+00000368  E368                     541      LSL.W   D1,D0
+0000036A                           542                   
+0000036A  123C 000D                543      MOVE.B  #13,D1
+0000036E                           544  
+0000036E  E268                     545      LSR.W   D1,D0  *D0 now holds MODE
+00000370                           546                                              
+00000370  3C00                     547      MOVE.W D0, D6 *D6 holds mode
+00000372                           548      
+Line 549 ERROR: Undefined symbol
+00000372  203C 004DBB8E            549      MOVE.L #example, D0
+00000378                           550  
+00000378  123C 000D                551      MOVE.B  #13,D1     
+0000037C                           552  
+0000037C  E368                     553      LSL.W   D1,D0
+0000037E                           554                   
+0000037E  123C 000D                555      MOVE.B  #13,D1
+00000382                           556  
+00000382  E268                     557      LSR.W   D1,D0  *D0 now holds MODE
+00000384                           558                                              
+00000384  3E00                     559      MOVE.W D0, D7 *D6 holds Register   
+00000386                           560      
+00000386  4EB8 0000                561      JSR PRINT_EA
+0000038A                           562  
+0000038A  6000 0002                563      BRA DONE
+0000038E                           564  
+0000038E                           565  DONE
+0000038E  4E75                     566      RTS
+00000390                           567      
+00000390                           568    INCLUDE 'MESSAGE_Data.X68'
+00000390                           569  
+00000390  =0000000D                570  CR  EQU $0D
+00000390  =0000000A                571  LF  EQU $0A 
+00000390                           572  
+00000390= 57 65 6C 63 6F 6D ...    573  WELCOME_MESSAGE DC.B 'Welcome to our Team wild pokemon disassembly!!', CR, LF, 0
+000003C1= 45 6E 74 65 72 20 ...    574  STARTING        DC.B 'Enter the starting location: ', 0
+000003DF= 45 6E 74 65 72 20 ...    575  ENDING          DC.B 'Enter the ending locaiton: ', 0
+000003FB                           576      
+000003FB= 41 44 44 49 2E 00        577  ADDI_MESSAGE    DC.B 'ADDI.',0
+00000401= 4D 4F 56 45 41 2E 00     578  MOVEA_MESSAGE   DC.B 'MOVEA.',0
+00000408= 4D 4F 56 45 2E 00        579  MOVE_MESSAGE    DC.B 'MOVE.',0
+0000040E= 4E 4F 50 00              580  NOP_MESSAGE     DC.B 'NOP',0
+00000412= 4D 4F 56 45 4D 2E 00     581  MOVEM_MESSAGE   DC.B 'MOVEM.',0
+00000419= 4A 53 52 00              582  JSR_MESSAGE     DC.B 'JSR',0
+0000041D= 52 54 53 00              583  RTS_MESSAGE     DC.B 'RTS',0
+00000421= 43 4C 52 00              584  CLR_MESSAGE     DC.B 'CLR',0
+00000425= 41 44 44 51 2E 00        585  ADDQ_MESSAGE    DC.B 'ADDQ.',0
+0000042B= 42 45 51 00              586  BEQ_MESSAGE     DC.B 'BEQ',0   *//
+0000042F= 42 4E 45 00              587  BNE_MESSAGE     DC.B 'BNE',0   *//
+00000433= 42 43 53 00              588  BCS_MESSAGE     DC.B 'BCS',0   *//
+00000437= 42 47 45 00              589  BGE_MESSAGE     DC.B 'BGE',0   *//
+0000043B= 42 47 54 00              590  BGT_MESSAGE     DC.B 'BGT',0   *//
+0000043F= 42 48 49 00              591  BHI_MESSAGE     DC.B 'BHI',0   *//
+00000443= 42 4C 45 00              592  BLE_MESSAGE     DC.B 'BLE',0   *//
+00000447= 42 4C 53 00              593  BLS_MESSAGE     DC.B 'BLS',0   *//
+0000044B= 42 4C 54 00              594  BLT_MESSAGE     DC.B 'BLT',0   *//
+0000044F= 42 4D 49 00              595  BMI_MESSAGE     DC.B 'BMI',0   *//
+00000453= 42 50 4C 00              596  BPL_MESSAGE     DC.B 'BPL',0   *//
+00000457= 42 56 43 00              597  BVC_MESSAGE     DC.B 'BVC',0   *//
+0000045B= 42 56 53 00              598  BVS_MESSAGE     DC.B 'BVS',0   *//
+0000045F                           599  
+0000045F= 4D 4F 56 45 51 2E 00     600  MOVEQ_MESSAGE   DC.B 'MOVEQ.',0
+00000466= 44 49 56 55 2E 00        601  DIVU_MESSAGE    DC.B 'DIVU.',0
+0000046C= 4F 52 2E 00              602  OR_MESSAGE      DC.B 'OR.',0
+00000470= 53 55 42 2E 00           603  SUB_MESSAGE     DC.B 'SUB.',0
+00000475= 43 4D 50 2E 00           604  CMP_MESSAGE     DC.B 'CMP.',0
+0000047A= 4D 55 4C 53 2E 00        605  MULS_MESSAGE    DC.B 'MULS.',0
+00000480= 41 4E 44 2E 00           606  AND_MESSAGE     DC.B 'AND.',0
+00000485= 41 44 44 2E 00           607  ADD_MESSAGE     DC.B 'ADD.',0
+0000048A= 41 44 44 41 2E 00        608  ADDA_MESSAGE    DC.B 'ADDA.',0
+00000490= 4C 53 4C 2E 00           609  LSL_MESSAGE     DC.B 'LSL.',0 *//
+00000495= 41 53 4C 2E 00           610  ASL_MESSAGE     DC.B 'ASL.',0
+0000049A= 52 4F 4C 2E 00           611  ROL_MESSAGE     DC.B 'ROL.',0
+0000049F= 4C 53 52 2E 00           612  LSR_MESSAGE     DC.B 'LSR.',0 *//
+000004A4= 41 53 52 2E 00           613  ASR_MESSAGE     DC.B 'ASR.',0
+000004A9= 52 4F 52 2E 00           614  ROR_MESSAGE     DC.B 'ROR.',0
+000004AE= 42 20 20 20 20 00        615  SIZE_B_PRINT    DC.B 'B    ',0
+000004B4= 57 20 20 20 20 00        616  SIZE_W_PRINT    DC.B 'W    ',0
+000004BA= 4C 20 20 20 20 00        617  SIZE_L_PRINT    DC.B 'L    ',0
+000004C0= 23 00                    618  POUND_SIGN      DC.B '#',0
+000004C2= 24 00                    619  HEX_SIGN        DC.B '$',0
+000004C4= 2E 00                    620  PERIOD          DC.B '.',0
+000004C6= 20 20 00                 621  SPACE           DC.B '  ',0
+000004C9                           622  
+000004C9= 44 00                    623  D_REGISTER      DC.B 'D',0
+000004CB= 41 00                    624  A_REGISTER      DC.B 'A',0
+000004CD= 28 41 00                 625  IA_START        DC.B '(A',0
+000004D0= 29 00                    626  IA_END          DC.B ')',0
+000004D2= 28 41 00                 627  A_PI_START      DC.B '(A',0
+000004D5= 29 2B 00                 628  A_PI_END        DC.B ')+',0
+000004D8= 2D 28 41 00              629  A_PD_START      DC.B '-(A',0
+000004DC= 29 00                    630  A_PD_END        DC.B ')',0
+000004DE= 2C 20 00                 631  COMMA           DC.B ', ',0
+000004E1                           632  
+000004E1                           633  
+000004E1                           634  
+000004E1                           635  
+000004E1                           636  
+000004E1                           637  
+000004E1                           638  
+000004E1                           639  
+000004E1                           640  
+000004E1                           641  
+000004E1                           642  -------------------- end include --------------------
+000004E1                           643    INCLUDE 'HEX_TO_ASCII_V1.X68'
+000004E1                           644      *ORG    $5000
+000004E1                           645  
+000004E1                           646  
+000004E1                           647  HEX_TO_ASCII      
+000004E2  4283                     648       CLR.L      D3
+000004E4                           649      
+000004E4                           650       *MOVE.L     #$ABCDEF, D5
+000004E4                           651       
+000004E4                           652  LOOP     
+000004E4  2C05                     653       MOVE.L     D5, D6                  * put the data in a register so we can manipulate it
+000004E6                           654       
+000004E6  4282                     655       CLR.L      D2
+000004E8                           656       
+000004E8  143C 001C                657       MOVE.B     #28, D2
+000004EC                           658  
+000004EC  E4AE                     659       LSR.L      D2, D6                  * shift out everything to the right of the last nibble, we print backwards so it shows up the correct order in the console
+000004EE                           660       
+000004EE  BC3C 000A                661       CMP.B      #10, D6
+000004F2                           662       
+000004F2  6C00 0006                663       BGE        LETTER                  * determine if a letter or a number
+000004F6                           664       
+000004F6  6000 000C                665       BRA        NUMBER
+000004FA                           666       
+000004FA                           667  LETTER
+000004FA  0606 0037                668       ADD.B      #55, D6
+000004FE                           669       
+000004FE  1206                     670       MOVE.B     D6, D1                  * add the amount to change to ascii and move to D1 to prepare for printing
+00000500                           671       
+00000500  6000 000C                672       BRA        PRINTOUT_NIBBLE
+00000504                           673  
+00000504                           674  NUMBER     
+00000504  0606 0030                675       ADD.B      #48, D6
+00000508                           676       
+00000508  1206                     677       MOVE.B     D6, D1                  * add the amount to change to ascii and move to D1 to prepare for printing
+0000050A                           678       
+0000050A  6000 0002                679       BRA        PRINTOUT_NIBBLE
+0000050E                           680  
+0000050E                           681  
+0000050E                           682  PRINTOUT_NIBBLE
+0000050E  E98D                     683      LSL.L      #4, D5                   * shift out the nibble you just read from the source
+00000510                           684      
+00000510  BC3C 0030                685      CMP.B      #$30, D6
+00000514                           686  
+00000514  67CE                     687      BEQ        LOOP             
+00000516                           688      
+00000516  103C 0006                689      MOVE.B     #6, D0                      * use TRAP task #6 to print a single character from D1  
+0000051A                           690      
+0000051A  4E4F                     691      TRAP #15
+0000051C                           692      
+0000051C  5203                     693      ADD.B      #1, D3                   * add to the counter in D3
+0000051E                           694       
+0000051E  B63C 0008                695      CMP.B      #8, D3                   * compare to the counter to check if you are done
+00000522                           696       
+00000522  6700 FE6A                697      BEQ        DONE
+00000526                           698          
+00000526  60BC                     699      BRA LOOP                            * continue the loop and print next nibble
+00000528                           700       
+00000528                           701            
+00000528                           702  
+00000528                           703  
+00000528                           704      *SIMHALT             ; halt simulator
+00000528                           705  
+00000528                           706  
+00000528                           707      *END    START       ; last line of source
+00000528                           708  
+00000528                           709  
+00000528                           710  
+00000528                           711  -------------------- end include --------------------
+00000528                           712       
+00000528                           713          
+00000528                           714      
+00000528                           715                 *END   $400 
+00000528                           716  
+00000528                           717   
+00000528                           718  
+00000528                           719  
+00000528                           720  
+00000528                           721  
+00000528                           722  
+00000528                           723  
+00000528                           724  
+00000528                           725  
+00000528                           726  
+Line 727 WARNING: END directive missing, starting address not set
 
-No errors detected
+10 errors detected
 1 warning generated
 
 
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ABSOLUTE_LONG       17E
-ABSOLUTE_SHORT      160
-ADDA_MESSAGE        29C
-ADDI_MESSAGE        20D
-ADDQ_MESSAGE        237
-ADDRESS_PD          F6
-ADDRESS_PI          CC
-ADDRESS_REGISTER    86
-ADDRESS_W_DISPLACEMENT  120
-ADDRESS_W_INDEX     120
-ADD_MESSAGE         297
-AND_MESSAGE         292
-ASL_MESSAGE         2A7
-ASR_MESSAGE         2B6
-A_PD_END            2E9
-A_PD_START          2E5
-A_PI_END            2E2
-A_PI_START          2DF
-A_REGISTER          2D8
-BCS_MESSAGE         245
-BEQ_MESSAGE         23D
-BGE_MESSAGE         249
-BGT_MESSAGE         24D
-BHI_MESSAGE         251
-BLE_MESSAGE         255
-BLS_MESSAGE         259
-BLT_MESSAGE         25D
-BMI_MESSAGE         261
-BNE_MESSAGE         241
-BPL_MESSAGE         265
-BVC_MESSAGE         269
-BVS_MESSAGE         26D
-CLR_MESSAGE         233
-CMP_MESSAGE         287
-CODE000             44
-CODE001             48
-CODE010             4C
-CODE011             50
-CODE100             54
-CODE101             58
-CODE110             5C
-CODE111             60
-COMMA               2EB
+ABSOLUTE_LONG       182
+ABSOLUTE_SHORT      164
+ADDA_MESSAGE        48A
+ADDI_MESSAGE        3FB
+ADDQ                2D4
+ADDQB               30C
+ADDQL               338
+ADDQW               322
+ADDQ_MESSAGE        425
+ADDRESS_PD          EA
+ADDRESS_PI          C0
+ADDRESS_REGISTER    7A
+ADDRESS_W_DISPLACEMENT  114
+ADDRESS_W_INDEX     118
+ADD_MESSAGE         485
+AND_MESSAGE         480
+ASL_MESSAGE         495
+ASR_MESSAGE         4A4
+A_PD_END            4DC
+A_PD_START          4D8
+A_PI_END            4D5
+A_PI_START          4D2
+A_REGISTER          4CB
+BCS_MESSAGE         433
+BEQ_MESSAGE         42B
+BGE_MESSAGE         437
+BGT_MESSAGE         43B
+BHI_MESSAGE         43F
+BLE_MESSAGE         443
+BLS_MESSAGE         447
+BLT_MESSAGE         44B
+BMI_MESSAGE         44F
+BNE_MESSAGE         42F
+BPL_MESSAGE         453
+BVC_MESSAGE         457
+BVS_MESSAGE         45B
+CLR_MESSAGE         421
+CMP                 204
+CMP_MESSAGE         475
+CODE000             3E
+CODE001             42
+CODE010             46
+CODE011             4A
+CODE100             4E
+CODE101             52
+CODE110             56
+CODE111             5A
+COMMA               4DE
 CR                  D
-DATA_REGISTER       66
-DIVU_MESSAGE        278
-DONE                1A0
-D_REGISTER          2D6
-ENDING              1F1
-GROUP_111           120
-HEX_SIGN            2D4
-IA_END              2DD
-IA_START            2DA
-IMMEDIATE           19C
-INDIRECT_ADDRESS    A2
+DATA_REGISTER       5E
+DIVU_MESSAGE        466
+DONE                38E
+D_REGISTER          4C9
+ENDING              3DF
+GROUP_111           11C
+HEX_SIGN            4C2
+HEX_TO_ASCII        4E1
+IA_END              4D0
+IA_START            4CD
+IMMEDIATE           1A0
+IMMEDIATE_B         1C8
+IMMEDIATE_L         1E4
+IMMEDIATE_W         1D6
+INDIRECT_ADDRESS    96
 JMP_TABLE_EA        E
-JMP_TABLE_EA_111    12E
-JSR_MESSAGE         22B
+JMP_TABLE_EA_111    12A
+JSR_MESSAGE         419
+LETTER              4FA
 LF                  A
-LSL_MESSAGE         2A2
-LSR_MESSAGE         2B1
-MOVEA_MESSAGE       213
-MOVEM_MESSAGE       224
-MOVEQ_MESSAGE       271
-MOVE_MESSAGE        21A
-MULS_MESSAGE        28C
-NOP_MESSAGE         220
-OR_MESSAGE          27E
-PC_W_DISPLACEMENT   160
+LOOP                4E4
+LSL_MESSAGE         490
+LSR_MESSAGE         49F
+MOVEA_MESSAGE       401
+MOVEM_MESSAGE       412
+MOVEQ_MESSAGE       45F
+MOVE_MESSAGE        408
+MULS_MESSAGE        47A
+NOP_MESSAGE         40E
+NUMBER              504
+OR_MESSAGE          46C
+PC_W_DISPLACEMENT   15C
 PC_W_INDEX          160
-POUND_SIGN          2D2
+PERIOD              4C4
+POUND_SIGN          4C0
+PRINTADDQ           34E
+PRINTOUT_NIBBLE     50E
 PRINT_EA            0
-REG000              154
-REG001              158
-REG010              14C
-REG011              150
-REG100              15C
-RETURN              64
-ROL_MESSAGE         2AC
-ROR_MESSAGE         2BB
-RTS_MESSAGE         22F
-SIZE_B_PRINT        2C0
-SIZE_L_PRINT        2CC
-SIZE_W_PRINT        2C6
-STARTING            1D3
-SUB_MESSAGE         282
-WELCOME_MESSAGE     1A2
+PRINT_SUB_CMP       284
+REG000              150
+REG001              154
+REG010              148
+REG011              14C
+REG100              158
+ROL_MESSAGE         49A
+ROR_MESSAGE         4A9
+RTS_MESSAGE         41D
+SIZE_B_PRINT        4AE
+SIZE_L_PRINT        4BA
+SIZE_W_PRINT        4B4
+SPACE               4C6
+STARTING            3C1
+SUB                 1F2
+SUB_CMP             216
+SUB_CMP_B           242
+SUB_CMP_L           26E
+SUB_CMP_W           258
+SUB_MESSAGE         470
+WELCOME_MESSAGE     390

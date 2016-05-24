@@ -1,8 +1,9 @@
-* ORG     $400
+ *ORG     $400
 
 * D6 is mode, D7 is register 
 * Dn, An, (An), (An)+, -(An)
 * Jumps based on mode
+* USING A5 AS THE ADDRESS REGISTER HOLDING CURRENT ADDRESS OF PROGRESS
 
 * Consider the next instruction. Why do we have to multiply the index 
 
@@ -10,15 +11,27 @@
 
 
 *start 
-*               MOVE.B      #%010,D6         *MODE
-*               
-*               MOVE.B      #%111,D7         *REGISTER
+               *MOVE.B       #%00, D5         *SIZE
+              
+               *MOVE.B       #%111,D6         *MODE
+               
+               *MOVE.B       #%100,D7         *REGISTER
+               
+               *MOVE.L       #$4000, A5
+
+               *MOVE.B       #$0040, (A5)  
+PRINT_EA 
                
                LEA     jmp_table_ea,A0      *Index into the table
 
                MULU        #6,D6            *Form offset     
 
+<<<<<<< HEAD
                JSR         0(A0,D6)         *Jump indirect with index
+=======
+               JMP         0(A0,D6)         *Jump indirect with index
+ 
+>>>>>>> origin/master
 
 jmp_table_ea   JMP         code000
 
@@ -185,16 +198,18 @@ ADDRESS_PD
             BRA DONE
             
 ADDRESS_W_DISPLACEMENT
+            BRA DONE
 
 ADDRESS_W_INDEX
+            BRA DONE
 
 GROUP_111
 
-               LEA     jmp_table_ea_111,A0    *Index into the table
+               LEA         jmp_table_ea_111,A0    *Index into the table
 
                MULU        #6,D7       *Form offset     
 
-               JSR          0(A0,D7)   *Jump indirect with index
+               JMP         0(A0,D7)   *Jump indirect with index
                
 jmp_table_ea_111   
                JMP         reg000
@@ -220,8 +235,10 @@ reg100       BRA         IMMEDIATE
 
 
 PC_W_DISPLACEMENT
+            BRA DONE
 
 PC_W_INDEX
+            BRA DONE
 
 ABSOLUTE_SHORT
             LEA         HEX_SIGN, A1
@@ -232,7 +249,7 @@ ABSOLUTE_SHORT
             
             CLR.L       D1
             
-            MOVE.W      (A5)+, D1
+            MOVE.L      (A5)+, D1
             
             MOVE.B      #15, D0
             
@@ -264,19 +281,75 @@ ABSOLUTE_LONG
 
 
 IMMEDIATE
+            LEA     POUND_SIGN, A1
+            
+            MOVE.B  #14, D0
+            
+            TRAP #15
+            
+            LEA     HEX_SIGN, A1
+            
+            TRAP #15
+            
+            CMP.B   #%00, D5
+            
+            BEQ     IMMEDIATE_B
+            
+            CMP.B   #%01, D5
+            
+            BEQ     IMMEDIATE_W
+            
+            BRA     IMMEDIATE_L
+            
+IMMEDIATE_B
+            CLR.L       D5
+   
+            MOVE.B      (A5)+, D5
+            
+            JSR         HEX_TO_ASCII
+            
+            BRA DONE
 
-            BRA DONE  
+IMMEDIATE_W
+            CLR.L       D5
+
+            MOVE.W      (A5)+, D5
+            
+            JSR         HEX_TO_ASCII
+            
+            *MOVE.B      #15, D0
+            
+            *MOVE.B      #16, D2
+            
+            *TRAP #15 
+            
+            BRA DONE        
+
+IMMEDIATE_L 
+            CLR.L       D5
+    
+            JSR         HEX_TO_ASCII
+            
+            TRAP #15
+            
+            BRA DONE
 
 DONE
     RTS
     
   INCLUDE 'MESSAGE_Data.X68'
+  INCLUDE 'HEX_TO_ASCII_V1.X68'
      
         
     
+<<<<<<< HEAD
+ 
+=======
+               *END   $400 
+>>>>>>> origin/master
+
  
 
- 
 
 
 
@@ -284,7 +357,11 @@ DONE
 
 
 
+<<<<<<< HEAD
+=======
 
+
+>>>>>>> origin/master
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
