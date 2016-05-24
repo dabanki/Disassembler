@@ -1,0 +1,332 @@
+00000000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.15.04
+Created On: 5/23/16 10:33:57 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : ADD_ADDA
+00000000                             3  * Written by : Ko Fukushima
+00000000                             4  * Date       : 5/18/2016
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000000                             7    
+00000000                             8  *        ORG    $1000
+00000000                             9  
+00000000                            10  *example          EQU     %1101011011000110
+00000000                            11          
+00000000                            12  *START:         * ORG and END address
+00000000                            13  
+00000000                            14                  * INCLUDE 'CMP.X68'
+00000000                            15                  * INCLUDE 'SUB.X68'
+00000000                            16                  * INCLUDE 'DIVU_OR.X68'
+00000000                            17                  * INCLUDE 'MULS_AND.X68'
+00000000                            18    
+00000000                            19  ADD_ADDA  *at this point we know the first 4 bits are 1101 -> ADD or ADDA -> compare the destination opmode
+00000000                            20                   
+00000000  4EB9 000000E4             21                   JSR      GET_SIZE_PURPLE
+00000006                            22                                              
+00000006  BA3C 0003                 23                   CMP.B    #$3, D5        *if D0 holds 3, the opcode is ADDA
+0000000A                            24                   
+0000000A  6700 0008                 25                   BEQ      ADDA_CODE
+0000000E                            26                   
+0000000E  4EF9 0000007E             27                   JMP      ADD_CODE
+00000014                            28                   
+00000014                            29  ADDA_CODE 
+00000014                            30                   * ADDA opcode message
+Line 31 ERROR: Undefined symbol
+00000014  43F9 004DBB8E             31                   LEA ADDA_MESSAGE, A1
+0000001A                            32                   
+0000001A  103C 000E                 33                   MOVE.B #14, D0
+0000001E                            34                   
+0000001E  4E4F                      35                   TRAP #15
+00000020                            36                   
+00000020  4285                      37                   CLR.L   D5         * clear for the size since this is not for the size purple
+00000022                            38                   
+00000022  4280                      39                   CLR.L D0                *clear D0
+00000024                            40                   
+00000024  4281                      41                   CLR.L D1                *clear D1
+00000026                            42                   
+Line 43 ERROR: Undefined symbol
+00000026  303C BB8E                 43                   MOVE.W  #example,D0     *D0 is the binary value to decode
+0000002A                            44                   
+0000002A  0800 0008                 45                   BTST    #8, D0
+0000002E                            46                   
+0000002E  6700 002A                 47                   BEQ     PRINTOUT_SIZE_W
+00000032                            48                   
+00000032  4EF9 0000006C             49                   JMP     PRINTOUT_SIZE_L
+00000038                            50                   
+00000038                            51  FINISH_PRINTING_SIZE
+00000038                            52  
+00000038  4EB9 00000168             53                   JSR     Set_Ea
+0000003E                            54                   
+Line 55 ERROR: Undefined symbol
+0000003E  4EB9 004DBB8E             55                   JSR     PRINT_EA *by using jmp table
+00000044                            56                   
+00000044  4EB9 00000146             57                   JSR     PRINT_COMMA
+0000004A                            58                   
+0000004A                            59                    * for the first Dn 
+0000004A  4EB9 00000154             60                   JSR     GET_Data_Register
+00000050                            61                   
+00000050  1C3C 0001                 62                   MOVE.B  #%001, D6 * for mode
+00000054                            63  
+Line 64 ERROR: Undefined symbol
+00000054  4EB9 004DBB8E             64                   JSR     PRINT_EA *by using jmp table
+0000005A                            65  
+0000005A                            66  *                 BRA     NEXT
+0000005A                            67                   
+0000005A                            68  PRINTOUT_SIZE_W
+0000005A                            69                   
+0000005A  3A3C 0001                 70                   MOVE    #%01, D5          
+0000005E                            71                   
+Line 72 ERROR: Undefined symbol
+0000005E  43F9 004DBB8E             72                   LEA      SIZE_W_PRINT,    A1
+00000064                            73                   
+00000064  103C 000E                 74                   MOVE.B   #14,             D0
+00000068                            75          
+00000068  4E4F                      76                   TRAP #15
+0000006A                            77                   
+0000006A  60CC                      78                   BRA     FINISH_PRINTING_SIZE
+0000006C                            79                   
+0000006C                            80  PRINTOUT_SIZE_L                           
+0000006C  3A3C 0002                 81                   MOVE    #%10, D5          
+00000070                            82                   
+Line 83 ERROR: Undefined symbol
+00000070  43F9 004DBB8E             83                   LEA      SIZE_L_PRINT,    A1
+00000076                            84                   
+00000076  103C 000E                 85                   MOVE.B   #14,             D0 
+0000007A                            86         
+0000007A  4E4F                      87                   TRAP #15
+0000007C                            88                   
+0000007C  60BA                      89                   BRA     FINISH_PRINTING_SIZE
+0000007E                            90  
+0000007E                            91  ADD_CODE
+0000007E                            92                   * ADD message
+Line 93 ERROR: Undefined symbol
+0000007E  43F9 004DBB8E             93                   LEA      ADD_MESSAGE,    A1
+00000084  103C 000E                 94                   MOVE.B   #14,            D0
+00000088  4E4F                      95                   TRAP #15
+0000008A                            96                   
+0000008A  4EB9 000000FC             97                   JSR     PRINTOUT_SIZE_PURPLE
+00000090                            98                   
+00000090                            99                   * check for dn and ea
+00000090  4280                     100                   CLR.L D0                *clear D0
+00000092                           101                   
+00000092  4281                     102                   CLR.L D1                *clear D1
+00000094                           103                   
+Line 104 ERROR: Undefined symbol
+00000094  303C BB8E                104                   MOVE.W  #example,D0     *D0 is the binary value to decode
+00000098                           105                   
+00000098  0800 0008                106                   BTST    #8, D0
+0000009C                           107                   
+0000009C  6700 0024                108                   BEQ     ADD_FIRST_EA
+000000A0                           109                   
+000000A0                           110                   * for the first Dn 
+000000A0  4EB9 00000154            111                   JSR     GET_Data_Register
+000000A6                           112                   
+000000A6  1C3C 0000                113                   MOVE.B  #%000, D6 * for mode
+000000AA                           114                   
+Line 115 ERROR: Undefined symbol
+000000AA  4EB9 004DBB8E            115                   JSR     PRINT_EA *by using jmp table
+000000B0                           116                   
+000000B0  4EB9 00000146            117                   JSR     PRINT_COMMA
+000000B6                           118                   
+000000B6  4EB9 00000168            119                   JSR     Set_Ea
+000000BC                           120                   
+Line 121 ERROR: Undefined symbol
+000000BC  4EB9 004DBB8E            121                   JSR     PRINT_EA *by using jmp table
+000000C2                           122                   
+000000C2                           123  *                 JMP     NEXT
+000000C2                           124                   
+000000C2                           125  ADD_FIRST_EA
+000000C2  4EB9 00000168            126                   JSR     Set_Ea
+000000C8                           127                   
+Line 128 ERROR: Undefined symbol
+000000C8  4EB9 004DBB8E            128                   JSR     PRINT_EA *by using jmp table
+000000CE                           129                   
+000000CE  4EB9 00000146            130                   JSR     PRINT_COMMA
+000000D4                           131                   
+000000D4                           132                    * for the first Dn 
+000000D4  4EB9 00000154            133                   JSR     GET_Data_Register
+000000DA                           134                   
+000000DA  1C3C 0000                135                   MOVE.B  #%000, D6 * for mode
+000000DE                           136  
+Line 137 ERROR: Undefined symbol
+000000DE  4EB9 004DBB8E            137                   JSR     PRINT_EA *by using jmp table
+000000E4                           138                   
+000000E4                           139  *                 JMP     NEXT
+000000E4                           140                   
+000000E4                           141  GET_SIZE_PURPLE * get the op-code 
+000000E4                           142  
+000000E4  4280                     143                   CLR.L D0                *clear D0
+000000E6                           144                   
+000000E6  4281                     145                   CLR.L D1                *clear D1
+000000E8                           146                   
+Line 147 ERROR: Undefined symbol
+000000E8  303C BB8E                147                   MOVE.W  #example,D0     *D0 is the binary value to decode
+000000EC                           148  
+000000EC  123C 0008                149                   MOVE.B  #8,D1           *8 bits is the number of times to shift to the left to remove opcode & register #
+000000F0                           150  
+000000F0  E368                     151                   LSL.W   D1,D0           *Shift the bits 8 times -> D0 now removes the opcode & reg#
+000000F2                           152                   
+000000F2  123C 000E                153                   MOVE.B  #14,D1          *14 bits is the number of times to shift to hold the mode number
+000000F6                           154  
+000000F6  E268                     155                   LSR.W   D1,D0           *Shift the bits 14 times -> D0 now holds the mode number
+000000F8                           156                   
+000000F8  1A00                     157                   MOVE.B  D0, D5          *push the size to the Data register 5 for the future use
+000000FA                           158                   
+000000FA  4E75                     159                   RTS 
+000000FC                           160  
+000000FC                           161  PRINTOUT_SIZE_PURPLE * get the size for ADDI, CLR, ADDQ, OR, SUB, CMP, AND, ADD
+000000FC                           162                       
+000000FC  BA7C 0000                163                   CMP    #%00, D5          
+00000100                           164                   
+00000100  6700 0014                165                   BEQ    PRINT_B
+00000104                           166                   
+00000104  BA7C 0001                167                   CMP    #%01, D5          
+00000108                           168                   
+00000108  6700 001C                169                   BEQ    PRINT_W
+0000010C                           170                   
+0000010C  BA7C 0002                171                   CMP    #%10, D5          
+00000110                           172                   
+00000110  6700 0024                173                   BEQ    PRINT_L
+00000114                           174                   
+00000114                           175  DONE_PRINTING
+00000114  4E75                     176                   RTS 
+00000116                           177                   
+00000116                           178  PRINT_B          
+Line 179 ERROR: Undefined symbol
+00000116  43F9 004DBB8E            179                   LEA      SIZE_B_PRINT,    A1
+0000011C  103C 000E                180                   MOVE.B   #14,            D0          
+00000120  4E4F                     181                   TRAP #15
+00000122                           182  
+00000122  4EF8 0114                183                   JMP      DONE_PRINTING
+00000126                           184                   
+00000126                           185  PRINT_W     
+Line 186 ERROR: Undefined symbol
+00000126  43F9 004DBB8E            186                   LEA      SIZE_W_PRINT,    A1
+0000012C  103C 000E                187                   MOVE.B   #14,             D0          
+00000130  4E4F                     188                   TRAP #15
+00000132                           189  
+00000132  4EF8 0114                190                   JMP      DONE_PRINTING
+00000136                           191  
+00000136                           192  
+00000136                           193  PRINT_L          
+Line 194 ERROR: Undefined symbol
+00000136  43F9 004DBB8E            194                   LEA      SIZE_L_PRINT,    A1
+0000013C  103C 000E                195                   MOVE.B   #14,             D0          
+00000140  4E4F                     196                   TRAP #15   
+00000142                           197                      
+00000142  4EF8 0114                198                   JMP    DONE_PRINTING
+00000146                           199                   
+00000146                           200  PRINT_COMMA
+00000146                           201  
+Line 202 ERROR: Undefined symbol
+00000146  43F9 004DBB8E            202                   LEA COMMA, A1
+0000014C  103C 000E                203                   MOVE.B #14, D0
+00000150  4E4F                     204                   TRAP #15
+00000152                           205                   
+00000152  4E75                     206                   RTS
+00000154                           207                   
+00000154                           208  GET_Data_Register
+00000154  4280                     209                   CLR.L D0                *clear D0
+00000156                           210                   
+00000156  4281                     211                   CLR.L D1                *clear D1
+00000158                           212                   
+Line 213 ERROR: Undefined symbol
+00000158  303C BB8E                213                   MOVE.W  #example,D0     *D0 is the binary value to decode
+0000015C                           214  
+0000015C  E948                     215                   LSL.W   #4,D0           *Shift the bits 4 times -> D0 now removes the opcode & reg#
+0000015E                           216                   
+0000015E  123C 000D                217                   MOVE.B  #13,D1          *14 bits is the number of times to shift to hold the mode number
+00000162                           218  
+00000162  E268                     219                   LSR.W   D1,D0           *Shift the bits 13 times -> D0 now holds the size number
+00000164                           220  
+00000164  1E00                     221                   MOVE.B  D0, D7          *put D0 to data register into D7 for future printing
+00000166                           222                   
+00000166  4E75                     223                   RTS
+00000168                           224                   
+00000168                           225  Set_Ea
+00000168                           226  
+00000168                           227                   * set register
+00000168  4280                     228                   CLR.L D0                *clear D0
+0000016A                           229                   
+0000016A  4281                     230                   CLR.L D1                *clear D1
+0000016C                           231                   
+Line 232 ERROR: Undefined symbol
+0000016C  303C BB8E                232                   MOVE.W  #example,D0     *D0 is the binary value to decode
+00000170                           233                 
+00000170  123C 000D                234                   MOVE.B  #13,D1           *8 bits is the number of times to shift to the left to remove opcode & register #
+00000174                           235  
+00000174  E368                     236                   LSL.W   D1,D0           *Shift the bits 8 times -> D0 now removes the opcode & reg#
+00000176                           237  
+00000176  123C 000D                238                   MOVE.B  #13,D1          *14 bits is the number of times to shift to hold the mode number
+0000017A                           239  
+0000017A  E268                     240                   LSR.W   D1,D0           *Shift the bits 13 times -> D0 now holds the size number
+0000017C                           241  
+0000017C  1E00                     242                   MOVE.B  D0, D7          *put D0 to data register into D7 for future printing
+0000017E                           243                   
+0000017E                           244                   * set mode
+0000017E  4280                     245                   CLR.L D0                *clear D0
+00000180                           246                   
+00000180  4281                     247                   CLR.L D1                *clear D1
+00000182                           248                   
+Line 249 ERROR: Undefined symbol
+00000182  303C BB8E                249                   MOVE.W  #example,D0     *D0 is the binary value to decode
+00000186                           250                 
+00000186  123C 000A                251                   MOVE.B  #10,D1           *8 bits is the number of times to shift to the left to remove opcode & register #
+0000018A                           252  
+0000018A  E368                     253                   LSL.W   D1,D0           *Shift the bits 8 times -> D0 now removes the opcode & reg#
+0000018C                           254  
+0000018C  123C 000D                255                   MOVE.B  #13,D1          *14 bits is the number of times to shift to hold the mode number
+00000190                           256  
+00000190  E268                     257                   LSR.W   D1,D0           *Shift the bits 13 times -> D0 now holds the size number
+00000192                           258  
+00000192  1C00                     259                   MOVE.B  D0, D6          *put D0 to data register into D7 for future printing
+00000194                           260                   
+00000194  4E75                     261                   RTS
+00000196                           262                   
+00000196                           263  *                 INCLUDE 'JUMPTABLE EA.X68'
+00000196                           264  *                 INCLUDE 'MESSAGE_Data.X68'  
+00000196                           265                   
+00000196                           266  
+00000196                           267  *NEXT
+00000196                           268  
+00000196                           269  *                 END START
+00000196                           270  
+00000196                           271  
+00000196                           272  
+00000196                           273  
+00000196                           274  
+00000196                           275  
+00000196                           276  
+00000196                           277  
+00000196                           278  
+00000196                           279  
+00000196                           280  
+00000196                           281  
+00000196                           282  
+00000196                           283  
+Line 284 WARNING: END directive missing, starting address not set
+
+20 errors detected
+1 warning generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+ADDA_CODE           14
+ADD_ADDA            0
+ADD_CODE            7E
+ADD_FIRST_EA        C2
+DONE_PRINTING       114
+FINISH_PRINTING_SIZE  38
+GET_DATA_REGISTER   154
+GET_SIZE_PURPLE     E4
+PRINTOUT_SIZE_L     6C
+PRINTOUT_SIZE_PURPLE  FC
+PRINTOUT_SIZE_W     5A
+PRINT_B             116
+PRINT_COMMA         146
+PRINT_L             136
+PRINT_W             126
+SET_EA              168
