@@ -8,7 +8,7 @@
     
 example          EQU     %0101111000000010
                 
-START:                  ; first instruction of program
+START:           ; first instruction of program
 
                  MOVEA.W    #$7000, A5
                  MOVE.L    #$10342035, (A5)
@@ -76,10 +76,6 @@ MOVEB            LEA MOVE_MESSAGE, A1   * printing out the opcode and size
                  MOVE.B D0, D7
                  
                  JSR print_ea
-                 
-                 
-
-                   
                  
                  BRA DONE
 
@@ -174,7 +170,6 @@ MOVEAL           LEA MOVEA_MESSAGE, A1  * start printing out opcode and size
                  BRA DONE 
                 
 SUB
-
     LEA SUB_MESSAGE, A1  *print SUB
                  
     MOVE.B #14, D0
@@ -422,6 +417,7 @@ PRINTADDQ
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
