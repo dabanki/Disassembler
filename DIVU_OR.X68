@@ -5,9 +5,9 @@
 * Description:
 *-----------------------------------------------------------
     
-DIVU_OR          JSR      GET_OPMODE  
+DIVU_OR          JSR      GET_SIZE_PURPLE  
                                           
-                 CMP.B    #$3, D0        *if D0 holds 3, the opcode is DIVU
+                 CMP.B    #$3, D5        *if D0 holds 3, the opcode is DIVU
                  
                  BEQ      DIVU_CODE
                  
@@ -19,11 +19,81 @@ DIVU_CODE
                  MOVE.B   #14, D0
                  TRAP #15
 
+                 MOVE    #%01, D5          
+                 
+                 LEA      SIZE_W_PRINT,    A1
+                 
+                 MOVE.B   #14,             D0
+        
+                 TRAP #15
+                 
+                 JSR     Set_Ea
+                 
+                 JSR     PRINT_EA *by using jmp table
+                 
+                 JSR     PRINT_COMMA
+                 
+                  * for the first Dn 
+                 JSR     GET_Data_Register
+                 
+                 MOVE.B  #%000, D6 * for mode
+
+                 JSR     PRINT_EA *by using jmp table
+
+*                 BRA     NEXT
+
 OR_CODE    
                  * OP_CODE message
                  LEA      OR_MESSAGE, A1
                  MOVE.B   #14, D0
                  TRAP #15
+
+                 JSR PRINTOUT_SIZE_PURPLE
+                 
+                   * check for dn and ea
+                 CLR.L D0                *clear D0
+                 
+                 CLR.L D1                *clear D1
+                 
+                 MOVE.W  #example,D0     *D0 is the binary value to decode
+                 
+                 BTST    #8, D0
+                 
+                 BEQ     OR_FIRST_EA
+                 
+                 * for the first Dn 
+                 JSR     GET_Data_Register
+                 
+                 MOVE.B  #%000, D6 * for mode
+                 
+                 JSR     PRINT_EA *by using jmp table
+                 
+                 JSR     PRINT_COMMA
+                 
+                 JSR     Set_Ea
+                 
+                 JSR     PRINT_EA *by using jmp table
+                 
+*                 JMP     NEXT
+                 
+OR_FIRST_EA
+                 JSR     Set_Ea
+                 
+                 JSR     PRINT_EA *by using jmp table
+                 
+                 JSR     PRINT_COMMA
+                 
+                  * for the first Dn 
+                 JSR     GET_Data_Register
+                 
+                 MOVE.B  #%000, D6 * for mode
+
+                 JSR     PRINT_EA *by using jmp table
+                 
+*                JMP     NEXT
+
+
+
 
 
 
