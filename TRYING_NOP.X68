@@ -5,10 +5,10 @@
 * Description:
 *-----------------------------------------------------------
     ORG    $1000
+
     
 START:                  ; first instruction of program
  
-
     MOVE.W  #$4E75, D2          * hardcodiing nop
 
    * CMP.L       #$4E71, D2      * has to be NOP
@@ -44,9 +44,36 @@ JSR_OPCODE
     
     TRAP #15
     
+    MOVE.L D2, D0
+
+    MOVE.B  #13,D1     
+
+    LSL.W   D1,D0
+                 
+    MOVE.B  #13,D1
+
+    LSR.W   D1,D0  *D0 now holds Register
+                                            
+    MOVE.W D0, D7 *D7 holds Register  
+
+    MOVE.L D2, D0
+
+    MOVE.B  #10,D1     
+
+    LSL.W   D1,D0
+                 
+    MOVE.B  #13,D1
+
+    LSR.W   D1,D0  *D0 now holds MODE
+                                            
+    MOVE.W D0, D6 *D6 holds MODE  
+    
+    JSR PRINT_EA
+    
     BRA DONE
     
 MOVEM_OPCODE 
+
     LEA         MOVEM_MESSAGE, A1     * print out message for 'MOVEM'
     
     MOVE.B      #14, D0
@@ -82,6 +109,32 @@ MOVEM_OPCODE
     MOVE.B      #14, D0
     
     TRAP #15
+    
+    MOVE.L D2, D0
+
+    MOVE.B  #13,D1     
+
+    LSL.W   D1,D0
+                 
+    MOVE.B  #13,D1
+
+    LSR.W   D1,D0  *D0 now holds Register
+                                            
+    MOVE.W D0, D7 *D7 holds Register  
+
+    MOVE.L D2, D0
+
+    MOVE.B  #10,D1     
+
+    LSL.W   D1,D0
+                 
+    MOVE.B  #13,D1
+
+    LSR.W   D1,D0  *D0 now holds MODE
+                                            
+    MOVE.W D0, D6 *D6 holds MODE  
+    
+    JSR PRINT_EA
 
     BRA DONE
    
@@ -123,13 +176,13 @@ CLR_OPCODE
     TRAP #15
 
     BRA DONE
-    
- INCLUDE 'MESSAGE_Data.X68'
-    SIMHALT             ; halt simulator
+
+   SIMHALT             ; halt simulator
 DONE
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
