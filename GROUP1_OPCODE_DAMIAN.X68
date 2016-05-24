@@ -6,7 +6,7 @@
 *-----------------------------------------------------------
     ORG    $1000
     
-example          EQU     %0001111000000010
+example          EQU     %0101111000000010
                 
 START:                  ; first instruction of program
 
@@ -366,12 +366,22 @@ ADDQL   *Print L
     JMP PRINTADDQ
     
 PRINTADDQ
+  
+    MOVE.L #example, D0
 
-    MOVE.W #$111, D6
+    MOVE.B  #4,D1     
+
+    LSL.W   D1,D0
+                 
+    MOVE.B  #13,D1
+
+    LSR.W   D1,D0  *D0 now holds DATA
     
-    MOVE.W #$100, D7
-
-    JSR PRINT_EA
+    MOVE.L D0, D1
+                                            
+    MOVE.B #3, D0
+                 
+    TRAP #15
     
     CLR.L D6
     
@@ -412,6 +422,7 @@ PRINTADDQ
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
