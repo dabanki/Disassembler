@@ -1,6 +1,6 @@
  *ORG     $400
 
-* D6 is mode, D7 is register 
+* D6 is mode, D7 is register, D5 is the size 
 * Dn, An, (An), (An)+, -(An)
 * Jumps based on mode
 * USING A5 AS THE ADDRESS REGISTER HOLDING CURRENT ADDRESS OF PROGRESS
@@ -11,7 +11,7 @@
 
 
 *start 
-               *MOVE.B       #%00, D5         *SIZE
+               *MOVE.B       #%00, D5
               
                *MOVE.B       #%111,D6         *MODE
                
@@ -26,12 +26,8 @@ PRINT_EA
 
                MULU        #6,D6            *Form offset     
 
-<<<<<<< HEAD
-               JSR         0(A0,D6)         *Jump indirect with index
-=======
                JMP         0(A0,D6)         *Jump indirect with index
  
->>>>>>> origin/master
 
 jmp_table_ea   JMP         code000
 
@@ -342,11 +338,7 @@ DONE
      
         
     
-<<<<<<< HEAD
- 
-=======
                *END   $400 
->>>>>>> origin/master
 
  
 
@@ -357,11 +349,7 @@ DONE
 
 
 
-<<<<<<< HEAD
-=======
 
-
->>>>>>> origin/master
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
