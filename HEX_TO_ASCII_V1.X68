@@ -14,7 +14,7 @@ HEX_TO_ASCII
     
      *MOVE.L     #$ABCDEF, D5
      
-LOOP     
+LOOP    
      MOVE.L     D5, D6                  * put the data in a register so we can manipulate it
      
      CLR.L      D2
@@ -73,6 +73,7 @@ PRINTOUT_NIBBLE
 * Put variables and constants here
 
     *END    START       ; last line of source
+
 
 
 
